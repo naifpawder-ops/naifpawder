@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinkJie 粉賊 · 日系法式千金選物</title>
+<meta name="description" content="日系法式千金風選物,日本折扣季現貨代購,一半全新代購、一半闆娘二手精選。">
+<!-- ===== 分享預覽(貼到 IG / LINE / FB 會顯示的標題+縮圖)=====
+     回家把 og:url 換成你的網址、og:image 換成一張代表圖網址(建議 1200x630)。
+     og:image 沒填也不會壞,只是分享時沒縮圖。 -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="PinkJie 粉賊">
+<meta property="og:title" content="PinkJie 粉賊 · 日系法式千金選物">
+<meta property="og:description" content="日本折扣季現貨代購,法式少女×千金風選物。追蹤才不會錯過快閃促銷 🎀">
+<meta property="og:url" content="">
+<meta property="og:image" content="">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  /* 粉圓體（開源 jf-open 粉圓）— 用 CDN 引入，載不到時自動退回系統圓體 */
+  @font-face{
+    font-family:"jf-openhuninn";
+    src:url("https://cdn.jsdelivr.net/gh/justfont/[email protected]/jf-openhuninn-1.1.woff2") format("woff2");
+    font-display:swap;
+  }
+
+  :root{
+    --bg:#fff5f4;        /* 極淺蜜桃粉底 */
+    --peach:#ffc0be;     /* 主色 蜜桃粉 */
+    --yellow:#ffdc5c;    /* 點綴 鵝黃 */
+    --wine:#a5243d;      /* 重點 酒紅 */
+    --ink:#5a1f2b;       /* 深酒紅文字 */
+    --muted:#b08a90;     /* 淡化文字 */
+    --line:#f6d9d7;      /* 邊線 */
+    --sold:#a5243d;      /* 售完 酒紅 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"jf-openhuninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  /* ===== 頁首 ===== */
+  header{
+    text-align:center; padding:52px 20px 40px;
+    background:linear-gradient(160deg,#ffd6d4 0%,var(--peach) 100%);
+    border-bottom:3px solid var(--wine); position:relative;
+  }
+  header .sub-en{
+    color:var(--wine); font-size:15px; letter-spacing:10px;
+    opacity:.75; margin-bottom:6px; padding-left:10px;
+  }
+  header .logo{
+    font-size:46px; letter-spacing:14px; font-weight:600; color:var(--wine);
+    padding-left:14px; line-height:1.1;
+  }
+  header .tagline{color:var(--wine); font-size:15px; letter-spacing:3px; margin-top:14px; opacity:.85}
+  header .tagline2{color:var(--muted); font-size:13px; letter-spacing:2px; margin-top:6px}
+  /* ===== 分類列 ===== */
+  .filters{
+    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+    padding:24px 16px; position:sticky; top:0; background:var(--bg);
+    border-bottom:1px solid var(--line); z-index:10;
+  }
+  .filters button{
+    border:1px solid var(--line); background:#fff; color:var(--ink);
+    padding:8px 18px; border-radius:999px; cursor:pointer; font-size:14px;
+    transition:.2s;
+  }
+  .filters button:hover{background:var(--peach); border-color:var(--peach)}
+  .filters button.active{background:var(--wine); color:#fff; border-color:var(--wine)}
+  /* ===== 商品格 ===== */
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:28px 20px; max-width:1100px; margin:32px auto; padding:0 20px 64px;
+  }
+  .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-size:15px; padding:60px 20px; letter-spacing:1px}
+  .card{position:relative; background:#fff; border:1px solid var(--line); border-radius:4px; overflow:hidden}
+  .card .imgwrap{position:relative; aspect-ratio:3/4; background:#f0ebe4; overflow:hidden}
+  .card img{width:100%; height:100%; object-fit:cover; display:block}
+  .card .noimg{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:13px;
+  }
+  .badge{
+    position:absolute; top:10px; left:10px; font-size:12px;
+    padding:3px 10px; border-radius:3px; color:#fff; letter-spacing:1px;
+  }
+  .badge.new{background:var(--wine)}
+  .badge.used{background:var(--peach); color:var(--wine)}
+  .soldmask{
+    position:absolute; inset:0; background:rgba(250,248,245,.72);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .soldmask span{
+    border:2px solid var(--sold); color:var(--sold); font-size:18px;
+    letter-spacing:4px; padding:6px 16px; transform:rotate(-6deg); background:#fff;
+  }
+  .info{padding:14px}
+  .info .brand{font-size:12px; color:var(--muted); letter-spacing:1px}
+  .info .name{font-size:15px; margin:3px 0 6px}
+  .info .meta{font-size:13px; color:var(--muted)}
+  .info .price{font-size:17px; font-weight:600; margin-top:8px}
+  .info .price .orig{font-size:13px; color:var(--muted); text-decoration:line-through; margin-left:6px; font-weight:400}
+  .buy{
+    display:block; text-align:center; margin-top:12px; padding:10px;
+    background:var(--yellow); color:var(--wine); font-weight:600;
+    text-decoration:none; border-radius:3px;
+    font-size:14px; letter-spacing:2px; transition:.2s;
+  }
+  .buy:hover{background:var(--wine); color:#fff}
+  .buy.disabled{background:#f3e2c9; color:#fff; pointer-events:none}
+  .buy.line{background:#fff; color:#06c755; border:1px solid #06c755; margin-top:8px}
+  .buy.line:hover{background:#06c755; color:#fff}
+  /* ===== 關於 ===== */
+  .about{
+    background:linear-gradient(160deg,var(--peach) 0%,#ffd6d4 100%);
+    border-top:3px solid var(--wine); padding:56px 24px;
+  }
+  .about-inner{max-width:620px; margin:0 auto; text-align:center; color:var(--ink)}
+  .about-title{
+    font-size:26px; letter-spacing:8px; color:var(--wine);
+    font-weight:600; margin-bottom:26px; padding-left:8px;
+  }
+  .about-inner p{font-size:15px; line-height:2; margin-bottom:14px}
+  .about-hi{
+    display:inline-block; margin-top:10px; padding:12px 22px;
+    background:var(--yellow); color:var(--wine); border-radius:999px;
+    font-weight:600; line-height:1.6;
+  }
+  /* 社群按鈕 */
+  .social{display:flex; gap:12px; justify-content:center; margin-top:26px; flex-wrap:wrap}
+  .social a{
+    display:inline-flex; align-items:center; gap:7px; text-decoration:none;
+    padding:11px 22px; border-radius:999px; font-weight:600; font-size:14px;
+    letter-spacing:1px; background:#fff; color:var(--wine); border:1px solid var(--wine);
+    transition:.2s;
+  }
+  .social a:hover{background:var(--wine); color:#fff}
+  .social a.line{color:#06c755; border-color:#06c755}
+  .social a.line:hover{background:#06c755; color:#fff}
+  /* 多圖標記 */
+  .multi{
+    position:absolute; bottom:10px; right:10px; background:rgba(90,31,43,.8);
+    color:#fff; font-size:12px; padding:2px 8px; border-radius:999px;
+  }
+  .imgwrap{cursor:pointer}
+  /* ===== 詳細彈窗 ===== */
+  .modal{
+    display:none; position:fixed; inset:0; background:rgba(90,31,43,.45);
+    z-index:100; padding:20px; overflow-y:auto;
+  }
+  .modal.open{display:flex; align-items:flex-start; justify-content:center}
+  .modal-box{
+    background:#fff; max-width:560px; width:100%; margin:auto; border-radius:8px;
+    position:relative; overflow:hidden; box-shadow:0 20px 60px rgba(90,31,43,.3);
+  }
+  .modal-close{
+    position:absolute; top:12px; right:12px; z-index:2; border:none;
+    background:rgba(255,255,255,.9); color:var(--wine); width:34px; height:34px;
+    border-radius:50%; font-size:16px; cursor:pointer;
+  }
+  .gallery-wrap{position:relative}
+  .gallery{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; background:#f0ebe4; scrollbar-width:none}
+  .gallery::-webkit-scrollbar{display:none}
+  .gallery img{width:100%; flex:0 0 100%; aspect-ratio:3/4; object-fit:cover; scroll-snap-align:center}
+  /* 相簿滑動圓點 */
+  .dots{
+    position:absolute; bottom:12px; left:0; right:0; display:flex; justify-content:center;
+    gap:7px; pointer-events:none;
+  }
+  .dots i{
+    width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.6);
+    box-shadow:0 0 3px rgba(90,31,43,.4); transition:.2s;
+  }
+  .dots i.on{background:#fff; width:9px; height:9px}
+  /* 多圖時右上角提示「← 滑動看更多 →」,幾秒後淡出 */
+  .swipehint{
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    background:rgba(90,31,43,.7); color:#fff; font-size:12px; padding:4px 12px;
+    border-radius:999px; letter-spacing:1px; pointer-events:none;
+    animation:hintfade 3s forwards;
+  }
+  @keyframes hintfade{0%,70%{opacity:1}100%{opacity:0}}
+  .modal-info{padding:22px}
+  .modal-info .brand{font-size:13px; color:var(--muted); letter-spacing:1px}
+  .modal-info .mname{font-size:20px; margin:4px 0 10px; color:var(--wine)}
+  .modal-info .mmeta{font-size:14px; color:var(--muted); margin-bottom:10px}
+  .tag{font-size:12px; padding:2px 9px; border-radius:3px; color:#fff; margin-right:6px}
+  .tag.new{background:var(--wine)} .tag.used{background:var(--peach); color:var(--wine)}
+  .mprice{font-size:22px; font-weight:600; color:var(--wine); margin-bottom:16px}
+  .mprice .orig{font-size:14px; color:var(--muted); text-decoration:line-through; margin-left:8px; font-weight:400}
+  /* 下單前提醒(匯款對帳才算成功) */
+  .orderhint{
+    background:#fff6e6; border:1px solid var(--yellow); border-radius:6px;
+    padding:11px 14px; font-size:13px; line-height:1.7; color:var(--ink);
+    margin-bottom:14px;
+  }
+  .orderhint b{color:var(--wine)}
+  /* 尺寸選擇鈕(商品有多個尺寸時顯示) */
+  .sizepick{margin-bottom:16px}
+  .sizepick .lbl{font-size:13px; color:var(--muted); margin-bottom:8px; letter-spacing:1px}
+  .sizepick .opts{display:flex; gap:8px; flex-wrap:wrap}
+  .sizepick .opts button{
+    min-width:46px; padding:8px 14px; border:1px solid var(--line); background:#fff;
+    color:var(--ink); border-radius:6px; cursor:pointer; font-size:14px; transition:.2s;
+  }
+  .sizepick .opts button:hover{border-color:var(--peach)}
+  .sizepick .opts button.on{background:var(--wine); color:#fff; border-color:var(--wine)}
+  .sizetable{width:100%; border-collapse:collapse; margin-bottom:16px; font-size:14px}
+  .sizetable td{border:1px solid var(--line); padding:7px 12px}
+  .sizetable td:first-child{background:var(--bg); color:var(--wine); width:40%}
+  .mnote{
+    background:var(--bg); border-left:3px solid var(--peach); padding:12px 14px;
+    font-size:14px; line-height:1.8; margin-bottom:18px; border-radius:0 4px 4px 0;
+  }
+  /* ===== 回到頂端 ===== */
+  #backtop{
+    position:fixed; right:20px; bottom:20px; z-index:50; width:46px; height:46px;
+    border:none; border-radius:50%; background:var(--wine); color:#fff; font-size:20px;
+    cursor:pointer; box-shadow:0 4px 14px rgba(90,31,43,.35);
+    opacity:0; visibility:hidden; transform:translateY(10px); transition:.25s;
+  }
+  #backtop.show{opacity:1; visibility:visible; transform:translateY(0)}
+  #backtop:hover{background:var(--ink)}
+  /* ===== 頁尾 ===== */
+  footer{text-align:center; padding:32px 20px; color:var(--muted); font-size:13px; background:var(--bg)}
+
+  /* ===== 手機微調(螢幕寬 ≤480px 才套用,電腦/平板不受影響)===== */
+  @media (max-width:480px){
+    header{padding:38px 16px 30px}
+    header .logo{font-size:38px; letter-spacing:10px; padding-left:10px}
+    header .sub-en{font-size:13px; letter-spacing:7px}
+    header .tagline{font-size:13px; letter-spacing:2px}
+    header .tagline2{font-size:12px}
+    /* 商品格改成兩欄(小手機也能一次看到兩件),縮小間距 */
+    .grid{grid-template-columns:repeat(2,1fr); gap:16px 12px; margin:20px auto; padding:0 12px 48px}
+    .info{padding:10px}
+    .info .name{font-size:14px}
+    .info .price{font-size:15px}
+    .buy{padding:9px; font-size:13px; letter-spacing:1px}
+    /* 彈窗貼合小螢幕、留少一點邊 */
+    .modal{padding:0}
+    .modal-box{border-radius:0; min-height:100%}
+    .modal-info{padding:18px 16px}
+    .about{padding:44px 18px}
+    .about-title{font-size:22px; letter-spacing:5px}
+  }
+  /* 超小螢幕(≤360px 老手機)商品格退回單欄,避免太擠 */
+  @media (max-width:360px){
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="sub-en">PinkJie</div>
+    <div class="logo">粉 賊</div>
+    <div class="tagline">フレンチガーリー × お嬢様</div>
+    <div class="tagline2">法式少女 · 千金選物 · 日本精選現貨</div>
+  </header>
+
+  <nav class="filters" id="filters"></nav>
+  <main class="grid" id="grid"></main>
+
+  <section class="about">
+    <div class="about-inner">
+      <div class="about-title">關於粉賊</div>
+      <p>"奶粉"是全世界最可愛的小博美 🐶</p>
+      <p>"奶粉賊賊"既是闆娘的身分,也藏著名字的諧音。</p>
+      <p>偏愛千金華麗、公主感,卻又能日常穿搭的服飾——<br>整體帶著優雅氣質的印象。</p>
+      <p>每年固定飛日本兩次折扣季,替大家挖寶、帶現貨回來。</p>
+      <p>每件都有標上<b>官網日幣價格</b>,一眼看出划算多少 💸</p>
+      <p>平時也會不定期快閃販售,推出網站折扣與促銷,記得追蹤才不會錯過 🎀</p>
+      <p class="about-hi">也歡迎提前私訊預購,會有驚喜折扣與小禮物 🎁</p>
+      <div class="social" id="social"></div>
+    </div>
+  </section>
+
+  <div class="modal" id="modal" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-box"></div>
+  </div>
+
+  <button id="backtop" title="回到頂端">↑</button>
+
+  <footer>
+    下單 & 超商取貨透過「7-11 賣貨便」· 點商品看詳情預訂
+  </footer>
+
+<script>
+/* =========================================================
+   ★★ 連結設定區 ★★  ← 回家把下面的網址換成你自己的就好,其他都不用動
+   - SHEET_CSV_URL:你的商品 Google 試算表「發布成 CSV」的網址(建表教學會教)
+        ‧ 留空 "" 的話,網站會顯示下面的範例商品(方便你先看版面)
+   - LINE_URL:你的 LINE 官方帳號或個人連結(例 https://line.me/ti/p/xxxxx)
+   - IG_URL:你的 IG(例 https://instagram.com/你的帳號),暫時用不到可留空 ""
+   - ORDER_FORM_URL:客人下單用的 Google 表單網址(下一步會教你建)
+   LINE/IG/表單三個留空 "" 的話,按鈕會自動改成提示「請私訊闆娘」,不會壞掉。
+   ========================================================= */
+const LINKS = {
+  SHEET_CSV_URL:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_zlUwll5ircE8KZtMrBHGUu5MJTx4bgdxLWQezF_wgaUsscpvlLINyr-yZsEVBWMCiDeYOxTns2MP/pub?gid=0&single=true&output=csv",   // 粉賊商品試算表
+  LINE_URL:       "https://line.me/ti/g2/eXgB_u4x63jT8QIBEoVRGxW0PgYLfB4LH-AFOg",   // 粉賊日本代購 LINE 社群
+  IG_URL:         "",   // ← 貼上你的 IG 連結(可先留空)
+  ORDER_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLScxi8NUSbOvvm4zFKZAMf_EgXSpN5aCY709VQe0VXTF2nUDnw/viewform",   // 粉賊下單表單(長網址,支援自動帶品名)
+};
+
+/* 商品照片放在網站的 images/ 資料夾。試算表「照片」欄只要填檔名(例 shirt1.jpg),
+   多張用半形逗號分隔。*/
+const IMG_BASE = "images/";
+
+/* =========================================================
+   ★ 範例商品 ★  只有在「還沒填試算表網址」時才會顯示,方便你先看版面。
+   填好 SHEET_CSV_URL 後,網站就改讀你的試算表,這裡的範例會被取代。
+   ========================================================= */
+const SAMPLE_PRODUCTS = [
+  { brand:"SNIDEL", name:"荷葉領泡泡袖上衣", type:"全新代購", size:"F", price:1280, origJpy:6900, status:"在售",
+    photos:[], m:{衣長:56,袖長:58,肩寬:38,胸寬:46}, note:"甜美荷葉領,袖口收口修飾手臂" },
+  { brand:"Lily Brown", name:"蕾絲拼接針織背心", type:"全新代購", size:"M", price:1580, origJpy:8800, status:"在售",
+    photos:[], m:{衣長:58,袖長:0,肩寬:38,胸寬:48}, note:"蕾絲細節,可內搭襯衫層次穿" },
+  { brand:"MERCURYDUO", name:"高腰格紋長裙", type:"二手", size:"S", price:980, origJpy:0, status:"售完",
+    photos:[], m:{衣長:85,袖長:0,肩寬:0,胸寬:34}, note:"九成新,無明顯瑕疵" },
+  { brand:"dazzlin", name:"荷葉邊碎花洋裝", type:"二手", size:"M", price:1150, origJpy:0, status:"在售",
+    photos:[], m:{衣長:92,袖長:24,肩寬:36,胸寬:44}, note:"腰間鬆緊顯瘦,裙襬有小碎花" },
+  { brand:"SNIDEL", name:"雙排釦短版西裝外套", type:"全新代購", size:"F", price:2380, origJpy:13200, status:"在售",
+    photos:[], m:{衣長:52,袖長:56,肩寬:40,胸寬:48}, note:"千金感短版剪裁,挺版好搭" },
+  { brand:"Lily Brown", name:"珍珠釦針織開衫", type:"二手", size:"L", price:680, origJpy:0, status:"在售",
+    photos:[], m:{衣長:60,袖長:57,肩寬:40,胸寬:50}, note:"珍珠釦點綴,狀況良好" },
+];
+
+/* 目前顯示的商品清單。先放範例,等試算表讀完會被換掉。 */
+let PRODUCTS = SAMPLE_PRODUCTS;
+
+/* ---- 以下不用改 ---- */
+let currentFilter = "全部";
+const FILTERS = ["全部","全新代購","二手","在售"];
+
+/* 價格顯示:大字台幣售價 + 劃掉的日幣原價(origJpy 為 0 就不顯示)*/
+function priceHtml(p){
+  const jpy = p.origJpy ? `<span class="orig">日本 ¥${p.origJpy.toLocaleString()}</span>` : "";
+  return `NT$${p.price.toLocaleString()}${jpy}`;
+}
+
+function render(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const list = PRODUCTS.filter(p=>{
+    if(currentFilter==="全部") return true;
+    if(currentFilter==="在售") return p.status==="在售";
+    return p.type===currentFilter;
+  }).sort((a,b)=>{  // 在售的排前面,售完的沉到最後
+    return (a.status==="售完"?1:0) - (b.status==="售完"?1:0);
+  });
+
+  if(list.length===0){  // 篩選後沒商品:不留白,給一句話
+    grid.innerHTML = `<div class="empty">這個分類目前沒有庫存,看看其他分類吧 🎀</div>`;
+    return;
+  }
+
+  list.forEach((p)=>{
+    const idx = PRODUCTS.indexOf(p);
+    const sold = p.status==="售完";
+    const badgeClass = p.type==="二手" ? "used" : "new";
+    const cover = p.photos && p.photos.length ? p.photos[0] : "";
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="imgwrap" onclick="openDetail(${idx})">
+        ${cover ? `<img src="${cover}" alt="${p.name}" loading="lazy">` : `<div class="noimg">尚未上傳照片</div>`}
+        <span class="badge ${badgeClass}">${p.type}</span>
+        ${p.photos && p.photos.length>1 ? `<span class="multi">📷 ${p.photos.length}</span>` : ``}
+        ${sold ? `<div class="soldmask"><span>售 完</span></div>` : ``}
+      </div>
+      <div class="info">
+        <div class="brand">${p.brand}</div>
+        <div class="name">${p.name}</div>
+        <div class="meta">尺寸 ${p.size}</div>
+        <div class="price">${priceHtml(p)}</div>
+        ${sold
+          ? `<span class="buy disabled">已 售 完</span>`
+          : `<a class="buy" onclick="openDetail(${idx})">看 詳 情 · 預 訂</a>`}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ===== 商品詳細彈窗 ===== */
+let SELECTED_SIZE = "";   // 目前這件商品被選的尺寸,帶進下單表單用
+
+/* 把「尺寸標示」欄拆成陣列。填 "S,M,L" → 多顆選鈕;填 "F" 或空 → 不拆 */
+function sizeOptions(p){
+  return (p.size||"").split(/[,、\s]+/).map(s=>s.trim()).filter(Boolean);
+}
+/* 多個尺寸才顯示選鈕;預設選第一個 */
+function sizePicker(p){
+  const opts = sizeOptions(p);
+  if(opts.length<=1) return "";  // 只有一個尺寸(或均碼)就不用選
+  return `<div class="sizepick">
+    <div class="lbl">選擇尺寸</div>
+    <div class="opts">${opts.map((s,i)=>`<button data-size="${s}" class="${i===0?'on':''}">${s}</button>`).join("")}</div>
+  </div>`;
+}
+function sizeTable(m){
+  const rows = Object.entries(m).filter(([k,v])=>v>0)
+    .map(([k,v])=>`<tr><td>${k}</td><td>${v} cm</td></tr>`).join("");
+  return rows ? `<table class="sizetable"><tbody>${rows}</tbody></table>` : "";
+}
+function openDetail(idx){
+  const p = PRODUCTS[idx];
+  const sold = p.status==="售完";
+  const modal = document.getElementById("modal");
+  const opts = sizeOptions(p);
+  SELECTED_SIZE = opts.length ? opts[0] : (p.size||"");  // 預設帶第一個尺寸
+  const many = p.photos && p.photos.length>1;
+  const gallery = (p.photos && p.photos.length)
+    ? `<div class="gallery-wrap">
+         <div class="gallery" id="gallery">${p.photos.map(src=>`<img src="${src}" alt="${p.name}">`).join("")}</div>
+         ${many ? `<div class="swipehint">← 滑動看更多 →</div>
+                   <div class="dots" id="dots">${p.photos.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join("")}</div>` : ``}
+       </div>`
+    : `<div class="gallery-wrap"><div class="gallery"><div class="noimg" style="aspect-ratio:3/4">尚未上傳照片</div></div></div>`;
+  modal.querySelector(".modal-box").innerHTML = `
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    ${gallery}
+    <div class="modal-info">
+      <div class="brand">${p.brand}</div>
+      <div class="mname">${p.name}</div>
+      <div class="mmeta"><span class="tag ${p.type==='二手'?'used':'new'}">${p.type}</span> 尺寸 ${p.size}</div>
+      <div class="mprice">${priceHtml(p)}</div>
+      ${sizePicker(p)}
+      ${sizeTable(p.m)}
+      ${p.note?`<div class="mnote">${p.note}</div>`:``}
+      ${sold
+        ? `<span class="buy disabled">已 售 完</span>`
+        : `<div class="orderhint">🎀 <b>下單提醒:</b>送出表單為預訂,<b>完成匯款並經闆娘對帳確認後才算下單成功</b>。確認收款後才會替你安排賣貨便寄件唷。</div>
+           <div id="orderbtns">${orderButtons(p)}</div>`}
+    </div>`;
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";  // 開彈窗時鎖住背景捲動
+
+  // 尺寸選鈕:點一下換選取,並即時更新下單按鈕帶入的尺寸
+  const sp = modal.querySelector(".sizepick");
+  if(sp){
+    sp.querySelectorAll(".opts button").forEach(btn=>{
+      btn.onclick = ()=>{
+        sp.querySelectorAll(".opts button").forEach(b=>b.classList.remove("on"));
+        btn.classList.add("on");
+        SELECTED_SIZE = btn.dataset.size;
+        document.getElementById("orderbtns").innerHTML = orderButtons(p);
+      };
+    });
+  }
+
+  // 相簿滑動時,高亮對應圓點
+  const g = document.getElementById("gallery");
+  const dots = document.getElementById("dots");
+  if(g && dots){
+    g.onscroll = ()=>{
+      const i = Math.round(g.scrollLeft / g.clientWidth);
+      dots.querySelectorAll("i").forEach((d,n)=>d.classList.toggle("on", n===i));
+    };
+  }
+}
+function closeDetail(){
+  document.getElementById("modal").classList.remove("open");
+  document.body.style.overflow = "";  // 關彈窗恢復背景捲動
+}
+
+/* 表單「想預訂的商品」那題的 entry 編號。回家取得預填連結後填進來(建表教學會教),
+   填了 → 品名+尺寸自動填進表單那一格;留空 → 退回用網址 # 帶品名(仍看得到)。 */
+const FORM_ITEM_ENTRY = "";   // 例 "entry.1234567"
+
+/* ===== 預訂按鈕:主按鈕連下單表單,底下一顆 LINE 詢問 ===== */
+function orderButtons(p){
+  // 用目前選到的尺寸組成品名,例「BEAMS 純棉寬版襯衫(S)」
+  const sizePart = SELECTED_SIZE ? `(${SELECTED_SIZE})` : "";
+  const itemName = `${p.brand} ${p.name}${sizePart}`;
+  const info = `${itemName} / ${p.type} / NT$${p.price}`;  // 給 LINE 複製用的完整資訊
+  let html = "";
+  if(LINKS.ORDER_FORM_URL){
+    let url;
+    if(FORM_ITEM_ENTRY){
+      // 有 entry 編號 → 用 Google 表單預填,商品欄自動填好「品名(尺寸)」
+      const sep = LINKS.ORDER_FORM_URL.includes("?") ? "&" : "?";
+      url = `${LINKS.ORDER_FORM_URL}${sep}usp=pp_url&${FORM_ITEM_ENTRY}=${encodeURIComponent(itemName)}`;
+    }else{
+      // 還沒填 entry → 先用 # 把品名帶在網址後面(你收單時看得到)
+      url = LINKS.ORDER_FORM_URL + "#" + encodeURIComponent(itemName);
+    }
+    html += `<a class="buy" href="${url}" target="_blank" rel="noopener">我 要 預 訂</a>`;
+  } else {
+    html += `<a class="buy" href="#" onclick="alert('下單表單建好後這裡會自動連過去,先用下面的 LINE 私訊闆娘');return false;">我 要 預 訂</a>`;
+  }
+  if(LINKS.LINE_URL){
+    const lineUrl = LINKS.LINE_URL;
+    html += `<a class="buy line" href="${lineUrl}" target="_blank" rel="noopener" onclick="navigator.clipboard&&navigator.clipboard.writeText('${info.replace(/'/g,"\\'")}')">LINE 詢 問(已複製品名)</a>`;
+  } else {
+    html += `<a class="buy line" href="#" onclick="alert('LINE 連結設定好後這裡會自動連過去');return false;">LINE 詢 問</a>`;
+  }
+  return html;
+}
+
+function renderFilters(){
+  const nav = document.getElementById("filters");
+  nav.innerHTML = "";   // 先清空,避免重複載入時分類鈕疊加變一堆
+  FILTERS.forEach(f=>{
+    const b = document.createElement("button");
+    b.textContent = f;
+    if(f===currentFilter) b.className="active";
+    b.onclick = ()=>{ currentFilter=f; renderFilters(); render(); };
+    nav.appendChild(b);
+  });
+}
+/* ===== 關於區的社群追蹤按鈕 ===== */
+function renderSocial(){
+  const box = document.getElementById("social");
+  let html = "";
+  if(LINKS.LINE_URL){
+    html += `<a class="line" href="${LINKS.LINE_URL}" target="_blank" rel="noopener">💬 加 LINE 好友</a>`;
+  }
+  if(LINKS.IG_URL){
+    html += `<a href="${LINKS.IG_URL}" target="_blank" rel="noopener">📷 追蹤 IG</a>`;
+  }
+  if(!html){
+    html = `<a href="#" onclick="alert('回家把 LINE / IG 連結填進程式上方的設定區,這裡就會出現按鈕');return false;">💬 加 LINE / 追蹤 IG</a>`;
+  }
+  box.innerHTML = html;
+}
+
+/* 按 Esc 關閉彈窗(桌機備援,手機主要靠點視窗外或右上 ✕)*/
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape") closeDetail();
+});
+
+/* ===== 回到頂端按鈕:捲動超過一頁才出現 ===== */
+function initBackTop(){
+  const btn = document.getElementById("backtop");
+  window.addEventListener("scroll", ()=>{
+    btn.classList.toggle("show", window.scrollY > window.innerHeight);
+  });
+  btn.onclick = ()=> window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* =========================================================
+   ★ 讀 Google 試算表 ★  以下都不用改
+   把試算表「發布成 CSV」後的資料,轉成上面 PRODUCTS 的格式。
+   ========================================================= */
+
+/* 一張照片欄的內容 → 可顯示的網址。
+   填檔名(例 shirt1.jpg)→ 補上 images/ 前綴;若已是完整網址(http 開頭)則直接用。 */
+function toImageUrl(raw){
+  const s = (raw||"").trim();
+  if(!s) return "";
+  if(/^https?:\/\//i.test(s)) return s;
+  return IMG_BASE + s;
+}
+
+/* 把「照片」欄字串(逗號分隔)拆成網址陣列 */
+function parsePhotos(cell){
+  return (cell||"").split(",").map(toImageUrl).filter(Boolean);
+}
+
+/* 解析一行 CSV(處理雙引號包住、內含逗號的欄位) */
+function parseCsvLine(line){
+  const out=[]; let cur=""; let q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(q){
+      if(c==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===',') {out.push(cur);cur="";}
+      else cur+=c;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+
+/* 整份 CSV 文字 → 商品陣列。第一行是標題,用中文欄名對應。 */
+function parseSheetCsv(text){
+  const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");
+  if(lines.length<2) return [];
+  const head = parseCsvLine(lines[0]).map(h=>h.trim());
+  const col = name => head.indexOf(name);
+  const ci = {
+    brand:col("品牌"), name:col("品名"), type:col("類型"), status:col("狀態"),
+    price:col("台幣售價"), orig:col("日本原價"), size:col("尺寸標示"),
+    len:col("衣長"), sleeve:col("袖長"), shoulder:col("肩寬"), chest:col("胸寬"),
+    photos:col("照片"), note:col("備註說明"),
+  };
+  const num = v => { const n=parseInt((v||"").replace(/[^\d]/g,""),10); return isNaN(n)?0:n; };
+  const get = (cells,i) => i>=0 && i<cells.length ? cells[i].trim() : "";
+  return lines.slice(1).map(line=>{
+    const c = parseCsvLine(line);
+    if(!get(c,ci.name) && !get(c,ci.brand)) return null; // 整列空白就略過
+    return {
+      brand:get(c,ci.brand), name:get(c,ci.name),
+      type:get(c,ci.type)||"全新代購", size:get(c,ci.size),
+      price:num(get(c,ci.price)), origJpy:num(get(c,ci.orig)),
+      status:get(c,ci.status)||"在售",
+      photos:parsePhotos(get(c,ci.photos)),
+      m:{衣長:num(get(c,ci.len)),袖長:num(get(c,ci.sleeve)),肩寬:num(get(c,ci.shoulder)),胸寬:num(get(c,ci.chest))},
+      note:get(c,ci.note),
+    };
+  }).filter(Boolean);
+}
+
+/* 從試算表載入商品;失敗就沿用範例並在 console 提示 */
+function loadProducts(){
+  if(!LINKS.SHEET_CSV_URL){
+    // 還沒填試算表網址 → 用範例商品
+    renderFilters(); render(); return;
+  }
+  // 加時間戳避免瀏覽器讀到舊快取,讓改表能較快反映
+  const url = LINKS.SHEET_CSV_URL + (LINKS.SHEET_CSV_URL.includes("?")?"&":"?") + "t=" + Date.now();
+  fetch(url)
+    .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+    .then(text=>{
+      const items = parseSheetCsv(text);
+      if(items.length){ PRODUCTS = items; }
+      renderFilters(); render();
+    })
+    .catch(err=>{
+      console.warn("讀試算表失敗,先顯示範例商品。請確認 SHEET_CSV_URL 是否為『發布成 CSV』的網址。", err);
+      renderFilters(); render();
+    });
+}
+
+loadProducts();
+renderSocial();
+initBackTop();
+</script>
+</body>
+</html>
