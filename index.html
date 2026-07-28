@@ -492,9 +492,10 @@ function parseSheetCsv(text){
     brand:col("品牌"), name:col("品名"), type:col("類型"), status:col("狀態"),
     price:col("台幣售價"), orig:col("日本原價"), size:col("尺寸標示"),
     len:col("衣長"), sleeve:col("袖長"), shoulder:col("肩寬"), chest:col("胸寬"),
+    waist:col("腰圍"), hip:col("臀圍"),
     photos:col("照片"), note:col("備註說明"),
   };
-  const num = v => { const n=parseInt((v||"").replace(/[^\d]/g,""),10); return isNaN(n)?0:n; };
+  const num = v => { const n=parseFloat((v||"").replace(/[^\d.]/g,""),10); return isNaN(n)?0:n; };
   const get = (cells,i) => i>=0 && i<cells.length ? cells[i].trim() : "";
   return lines.slice(1).map(line=>{
     const c = parseCsvLine(line);
@@ -505,8 +506,7 @@ function parseSheetCsv(text){
       price:num(get(c,ci.price)), origJpy:num(get(c,ci.orig)),
       status:get(c,ci.status)||"在售",
       photos:parsePhotos(get(c,ci.photos)),
-      m:{衣長:num(get(c,ci.len)),袖長:num(get(c,ci.sleeve)),肩寬:num(get(c,ci.shoulder)),胸寬:num(get(c,ci.chest))},
-      note:get(c,ci.note),
+      m:{衣長:num(get(c,ci.len)),肩寬:num(get(c,ci.shoulder)),胸寬:num(get(c,ci.chest)),腰圍:num(get(c,ci.waist)),臀圍:num(get(c,ci.hip)),袖長:num(get(c,ci.sleeve))},
     };
   }).filter(Boolean);
 }
