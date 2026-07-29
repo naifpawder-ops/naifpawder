@@ -507,6 +507,7 @@ function parseSheetCsv(text){
       status:get(c,ci.status)||"在售",
       photos:parsePhotos(get(c,ci.photos)),
       m:{衣長:num(get(c,ci.len)),肩寬:num(get(c,ci.shoulder)),胸寬:num(get(c,ci.chest)),腰圍:num(get(c,ci.waist)),臀圍:num(get(c,ci.hip)),袖長:num(get(c,ci.sleeve))},
+      note:get(c,ci.note),
     };
   }).filter(Boolean);
 }
