@@ -87,6 +87,11 @@
   .info .meta{font-size:14px; color:var(--muted)}
   .info .price{font-size:19px; font-weight:600; margin-top:8px}
   .info .price .orig{font-size:13px; color:var(--muted); text-decoration:line-through; margin-left:6px; font-weight:400}
+  .discount-badge{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:.5px;
+    padding:2px 8px; border-radius:999px; margin-left:6px; vertical-align:middle;
+    background:var(--yellow); color:var(--wine);
+  }
   .buy{
     display:block; text-align:center; margin-top:12px; padding:10px;
     background:var(--yellow); color:var(--wine); font-weight:600;
@@ -152,6 +157,17 @@
     box-shadow:0 0 3px rgba(90,31,43,.4); transition:.2s;
   }
   .dots i.on{background:#fff; width:9px; height:9px}
+  .gnav{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:3;
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:rgba(255,255,255,.85); color:var(--wine); font-size:18px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(90,31,43,.25); transition:.2s;
+  }
+  .gnav:hover{background:#fff}
+  .gnav:active{transform:translateY(-50%) scale(.92)}
+  .gnav.gprev{left:10px}
+  .gnav.gnext{right:10px}
   .swipehint{
     position:absolute; top:12px; left:50%; transform:translateX(-50%);
     background:rgba(90,31,43,.7); color:#fff; font-size:12px; padding:4px 12px;
@@ -214,6 +230,7 @@
     .modal-info{padding:18px 16px}
     .about{padding:44px 18px}
     .about-title{font-size:22px; letter-spacing:5px}
+    .gnav{width:30px; height:30px; font-size:16px}
   }
   @media (max-width:360px){
     .grid{grid-template-columns:1fr}
@@ -264,6 +281,8 @@ const LINKS = {
   ORDER_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLScxi8NUSbOvvm4zFKZAMf_EgXSpN5aCY709VQe0VXTF2nUDnw/viewform",
 };
 const IMG_BASE = "images/";
+// 日幣換算台幣的匯率,拿來算「跟日本原價比便宜多少%」的小標籤。之後匯率變了就改這個數字。
+const JPY_RATE = 0.21;
 const SAMPLE_PRODUCTS = [
   { brand:"SNIDEL", name:"荷葉領泡泡袖上衣", type:"全新代購", size:"F", price:1280, origJpy:6900, status:"在售",
     photos:[], m:{衣長:56,袖長:58,肩寬:38,胸寬:46}, note:"甜美荷葉領,袖口收口修飾手臂" },
@@ -282,8 +301,16 @@ let PRODUCTS = SAMPLE_PRODUCTS;
 let currentFilter = "全部";
 const FILTERS = ["全部","全新代購","二手","在售"];
 function priceHtml(p){
-  const jpy = p.origJpy ? `<span class="orig">日本 ¥${p.origJpy.toLocaleString()}</span>` : "";
-  return `NT$${p.price.toLocaleString()}${jpy}`;
+  if(!p.origJpy) return `NT$${p.price.toLocaleString()}`;
+  const jpy = `<span class="orig">日本 ¥${p.origJpy.toLocaleString()}</span>`;
+  const refTwd = p.origJpy * JPY_RATE;
+  let badge = "";
+  if(refTwd > 0 && p.price > 0){
+    const pct = Math.round((1 - p.price / refTwd) * 100);
+    if(pct > 0) badge = `<span class="discount-badge">省${pct}%</span>`;
+    else if(pct < 0) badge = `<span class="discount-badge">貴${Math.abs(pct)}%</span>`;
+  }
+  return `NT$${p.price.toLocaleString()}${jpy}${badge}`;
 }
 function render(){
   const grid = document.getElementById("grid");
@@ -352,7 +379,9 @@ function openDetail(idx){
   const gallery = (p.photos && p.photos.length)
     ? `<div class="gallery-wrap">
          <div class="gallery" id="gallery">${p.photos.map(src=>`<img src="${src}" alt="${p.name}">`).join("")}</div>
-         ${many ? `<div class="swipehint">← 滑動看更多 →</div>
+         ${many ? `<button class="gnav gprev" onclick="galleryNav(-1)" aria-label="上一張">‹</button>
+                   <button class="gnav gnext" onclick="galleryNav(1)" aria-label="下一張">›</button>
+                   <div class="swipehint">← 滑動或點箭頭看更多 →</div>
                    <div class="dots" id="dots">${p.photos.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join("")}</div>` : ``}
        </div>`
     : `<div class="gallery-wrap"><div class="gallery"><div class="noimg" style="aspect-ratio:3/4">尚未上傳照片</div></div></div>`;
@@ -393,6 +422,11 @@ function openDetail(idx){
       dots.querySelectorAll("i").forEach((d,n)=>d.classList.toggle("on", n===i));
     };
   }
+}
+function galleryNav(dir){
+  const g = document.getElementById("gallery");
+  if(!g) return;
+  g.scrollBy({left: dir * g.clientWidth, behavior: "smooth"});
 }
 function closeDetail(){
   document.getElementById("modal").classList.remove("open");
