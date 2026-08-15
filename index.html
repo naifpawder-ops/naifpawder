@@ -364,7 +364,7 @@ function sizePicker(p){
   </div>`;
 }
 function sizeTable(m){
-  const rows = Object.entries(m).filter(([k,v])=>v>0)
+  const rows = Object.entries(m).filter(([k,v])=>v!=="" && v!==0)
     .map(([k,v])=>`<tr><td>${k}</td><td>${v} cm</td></tr>`).join("");
   return rows ? `<table class="sizetable"><tbody>${rows}</tbody></table>` : "";
 }
@@ -540,7 +540,7 @@ function parseSheetCsv(text){
       price:num(get(c,ci.price)), origJpy:num(get(c,ci.orig)),
       status:get(c,ci.status)||"在售",
       photos:parsePhotos(get(c,ci.photos)),
-      m:{衣長:num(get(c,ci.len)),肩寬:num(get(c,ci.shoulder)),胸寬:num(get(c,ci.chest)),腰圍:num(get(c,ci.waist)),臀圍:num(get(c,ci.hip)),袖長:num(get(c,ci.sleeve))},
+      m:{衣長:get(c,ci.len),肩寬:get(c,ci.shoulder),胸寬:get(c,ci.chest),腰圍:get(c,ci.waist),臀圍:get(c,ci.hip),袖長:get(c,ci.sleeve)},
       note:get(c,ci.note),
     };
   }).filter(Boolean);
