@@ -307,7 +307,7 @@ function priceHtml(p){
   let badge = "";
   if(refTwd > 0 && p.price > 0){
     const pct = Math.round((1 - p.price / refTwd) * 100);
-    if(pct > 0) badge = `<span class="discount-badge">省${pct}%</span>`;
+    if(pct >= 5) badge = `<span class="discount-badge">省${pct}%</span>`;
   }
   return `NT$${p.price.toLocaleString()}${jpy}${badge}`;
 }
