@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>花結感謝祭抽獎</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<style>
+  :root{
+    color-scheme:light;
+    --bg:#fff5f4; --peach:#ffc0be; --peach-soft:#ffd6d4; --yellow:#ffdc5c; --wine:#a5243d;
+    --ink:#5a1f2b; --muted:#b08a90; --line:#f6d9d7; --paper:#ffffff; --cream:#fff6e6;
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--bg)}
+  body{
+    font-family:"Zen Maru Gothic","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    color:var(--ink); line-height:1.6; margin:0; padding-inline:16px; padding-block:0 48px;
+  }
+  button,textarea,input{font-family:inherit; color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:3px solid var(--yellow); outline-offset:2px}
+
+  header{
+    margin-inline:-16px; text-align:center; padding:40px 20px 30px;
+    background:linear-gradient(160deg,var(--peach-soft) 0%,var(--peach) 100%);
+    border-bottom:3px solid var(--wine);
+  }
+  .sub-en{color:var(--wine); font-size:14px; letter-spacing:10px; opacity:.75; padding-left:10px}
+  .logo{font-size:36px; letter-spacing:10px; font-weight:700; color:var(--wine); padding-left:10px; line-height:1.2; margin:2px 0 0}
+  .tagline{color:var(--wine); font-size:15px; letter-spacing:3px; margin-top:10px; opacity:.85}
+
+  main{max-width:960px; margin:0 auto; display:grid; gap:28px; padding-top:28px}
+  h2{font-size:20px; letter-spacing:4px; color:var(--wine); margin:0; text-wrap:balance}
+  .hint{font-size:13px; color:var(--muted); letter-spacing:.5px; margin:0}
+
+  /* 抽獎舞台 */
+  .stage{
+    background:var(--paper); border:1px solid var(--line); border-radius:8px;
+    padding:28px 20px 26px; text-align:center; display:grid; gap:16px; justify-items:center;
+    box-shadow:0 10px 30px rgba(90,31,43,.08);
+  }
+  .now-prize{display:grid; gap:4px}
+  .now-prize .label{font-size:13px; letter-spacing:4px; color:var(--muted)}
+  .now-prize .name{font-size:24px; font-weight:700; color:var(--wine); letter-spacing:2px; text-wrap:balance}
+  .now-prize .count{font-size:13px; color:var(--muted)}
+  .reel{
+    width:min(100%,520px); min-height:120px; display:grid; place-items:center;
+    background:var(--cream); border:2px dashed var(--yellow); border-radius:999px;
+    padding:12px 28px; position:relative; overflow:hidden;
+  }
+  .reel .who{font-size:clamp(30px,8vw,52px); font-weight:700; letter-spacing:3px; color:var(--ink); word-break:break-all}
+  .reel.rolling .who{color:var(--muted)}
+  .reel.won{background:var(--yellow); border-style:solid; border-color:var(--wine)}
+  .reel.won .who{color:var(--wine); animation:pop .5s ease-out}
+  @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+  .reel .idle{font-size:16px; color:var(--muted); letter-spacing:2px}
+  .controls{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+  .btn{
+    border:1px solid var(--wine); background:var(--paper); color:var(--wine);
+    padding:11px 24px; border-radius:999px; font-weight:700; font-size:15px; letter-spacing:2px; transition:.2s;
+  }
+  .btn:hover{background:var(--peach-soft)}
+  .btn.primary{background:var(--wine); color:#fff; font-size:18px; padding:14px 40px}
+  .btn.primary:hover{background:#8b1d33}
+  .btn:disabled{opacity:.4; cursor:not-allowed}
+  .pool{font-size:13px; color:var(--muted)}
+
+  /* 中獎名單 */
+  .results{display:grid; gap:12px}
+  .results-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between}
+  .prize-groups{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .pg{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:14px 16px}
+  .pg h3{margin:0 0 8px; font-size:15px; color:var(--wine); letter-spacing:1px; display:flex; justify-content:space-between; gap:8px}
+  .pg h3 span{font-size:12px; color:var(--muted); font-weight:500; white-space:nowrap; font-variant-numeric:tabular-nums}
+  .pg ol{margin:0; padding-left:22px; display:grid; gap:2px}
+  .pg li{font-size:15px}
+  .pg li.new{color:var(--wine); font-weight:700}
+  .pg .none{font-size:13px; color:var(--muted)}
+  .empty{font-size:14px; color:var(--muted)}
+
+  /* 設定 */
+  details.setup{background:var(--paper); border:1px solid var(--line); border-radius:6px}
+  details.setup summary{padding:14px 18px; cursor:pointer; font-weight:700; color:var(--wine); letter-spacing:2px}
+  .setup-body{padding:0 18px 18px; display:grid; gap:18px}
+  .cols{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .field{display:grid; gap:6px}
+  .field label{font-weight:700; font-size:14px; letter-spacing:1px}
+  textarea{
+    width:100%; min-height:220px; resize:vertical; border:1px solid var(--line); border-radius:6px;
+    background:var(--bg); padding:10px 12px; font-size:15px; line-height:1.7;
+  }
+  .opts{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:14px}
+  .opts label{display:flex; gap:6px; align-items:center}
+  .sample{display:inline-block; background:var(--yellow); color:var(--wine); font-size:11px; font-weight:700; padding:1px 8px; border-radius:999px; margin-left:6px; vertical-align:middle}
+  .confirm{display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:14px; color:var(--wine)}
+  .toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:8px 18px; border-radius:999px; font-size:14px}
+  #copy-box{min-height:120px}
+
+  canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none}
+  @media (prefers-reduced-motion:reduce){ .reel.won .who{animation:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sub-en">HanaJie</div>
+  <h1 class="logo">花 結 選 物</h1>
+  <div class="tagline">感謝有購買的妳 · 好禮抽獎</div>
+</header>
+
+<main>
+  <section class="stage" aria-live="polite">
+    <div class="now-prize">
+      <div class="label">現在抽</div>
+      <div class="name" id="prize-name">—</div>
+      <div class="count" id="prize-count"></div>
+    </div>
+    <div class="reel" id="reel"><div class="idle" id="who">按下按鈕開始抽</div></div>
+    <div class="controls">
+      <button class="btn primary" id="draw-btn">抽出中獎者</button>
+      <button class="btn" id="redraw-btn" hidden>這位不算,重抽</button>
+    </div>
+    <div class="pool" id="pool"></div>
+  </section>
+
+  <section class="results">
+    <div class="results-head">
+      <h2>中獎名單</h2>
+      <button class="btn" id="copy-btn">複製名單</button>
+    </div>
+    <div class="prize-groups" id="groups"></div>
+    <textarea id="copy-box" hidden readonly aria-label="中獎名單文字"></textarea>
+  </section>
+
+  <details class="setup" id="setup">
+    <summary>設定客人名單和獎品</summary>
+    <div class="setup-body">
+      <div class="cols">
+        <div class="field">
+          <label for="names">客人名單 <span class="sample" id="names-sample">範例</span></label>
+          <p class="hint">一行一位。同一位客人寫兩次,就是兩次機會(除非勾下面的「同名只算一次」)。</p>
+          <textarea id="names"></textarea>
+        </div>
+        <div class="field">
+          <label for="prizes">獎品 <span class="sample" id="prizes-sample">範例</span></label>
+          <p class="hint">一行一種獎品,後面空一格寫數量,例如「購物金200元 3」。沒寫數量就是 1 份。照順序由上往下抽。</p>
+          <textarea id="prizes"></textarea>
+        </div>
+      </div>
+      <div class="opts">
+        <label><input type="checkbox" id="opt-dedupe" checked> 同名只算一次</label>
+        <label><input type="checkbox" id="opt-once" checked> 每人最多中一次</label>
+      </div>
+      <div class="controls" style="justify-content:flex-start">
+        <button class="btn primary" id="apply-btn">套用並重新開始</button>
+      </div>
+      <div class="confirm" id="confirm" hidden>
+        已經有抽出的結果,重新開始會清掉。確定嗎?
+        <button class="btn" id="confirm-yes">確定清掉</button>
+        <button class="btn" id="confirm-no">先不要</button>
+      </div>
+    </div>
+  </details>
+</main>
+
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+  var SAMPLE_NAMES = ['王小美','林佳穎','陳怡君','張雅婷','李思妤','黃郁晴','吳欣怡','蔡佩珊','鄭宜蓁','許筱涵','周芷若','謝語彤'].join('\n');
+  var SAMPLE_PRIZES = ['花結購物金500元 1','花結購物金200元 2','日本限定小禮物 3'].join('\n');
+  var KEY = 'hanajie-lottery-v1';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var state = load() || { names:SAMPLE_NAMES, prizes:SAMPLE_PRIZES, dedupe:true, once:true, wins:[] };
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  function parseNames(){
+    var list = state.names.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+    if (state.dedupe) list = list.filter(function(n,i){ return list.indexOf(n) === i; });
+    return list;
+  }
+  function parsePrizes(){
+    return state.prizes.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean).map(function(line){
+      var m = line.match(/^(.*?\S)(?:[\s　]+[xX×*]?|[\s　]*[xX×*])[\s　]*(\d+)\s*(份|個|名|位)?$/);
+      if (m && m[1].trim()) return { name:m[1].trim(), qty:parseInt(m[2],10) };
+      return { name:line, qty:1 };
+    });
+  }
+  // 公平亂數:用瀏覽器的密碼學亂數,不用 Math.random
+  function randInt(n){
+    var a = new Uint32Array(1), lim = Math.floor(0x100000000 / n) * n;
+    do { crypto.getRandomValues(a); } while (a[0] >= lim);
+    return a[0] % n;
+  }
+
+  function currentPrize(){
+    var prizes = parsePrizes();
+    for (var i = 0; i < prizes.length; i++){
+      var got = state.wins.filter(function(w){ return w.prize === i; }).length;
+      if (got < prizes[i].qty) return { idx:i, p:prizes[i], left:prizes[i].qty - got };
+    }
+    return null;
+  }
+  function pool(){
+    var names = parseNames();
+    if (!state.once) return names;
+    // 名單有重複(多次機會)時,中過的人整個拿掉
+    var won = state.wins.map(function(w){ return w.name; });
+    return names.filter(function(n){ return won.indexOf(n) < 0; });
+  }
+
+  var rolling = false, lastWin = -1;
+
+  function render(){
+    var cur = currentPrize(), pl = pool(), prizes = parsePrizes();
+    $('prize-name').textContent = cur ? cur.p.name : (prizes.length ? '全部抽完了' : '還沒設定獎品');
+    $('prize-count').textContent = cur ? '這項還有 ' + cur.left + ' 份' : '';
+    $('pool').textContent = '還有 ' + pl.length + ' 個機會可以抽中 · 共 ' + parseNames().length + ' 個';
+    $('draw-btn').disabled = rolling || !cur || pl.length === 0;
+    $('redraw-btn').hidden = rolling || lastWin < 0;
+    $('names-sample').hidden = state.names !== SAMPLE_NAMES;
+    $('prizes-sample').hidden = state.prizes !== SAMPLE_PRIZES;
+
+    var g = $('groups'); g.innerHTML = '';
+    if (!prizes.length){ g.innerHTML = '<p class="empty">先在下面設定獎品。</p>'; return; }
+    prizes.forEach(function(p, i){
+      var wins = state.wins.filter(function(w){ return w.prize === i; });
+      var box = document.createElement('div'); box.className = 'pg';
+      var h = document.createElement('h3'); h.textContent = p.name;
+      var s = document.createElement('span'); s.textContent = wins.length + ' / ' + p.qty; h.appendChild(s);
+      box.appendChild(h);
+      if (wins.length){
+        var ol = document.createElement('ol');
+        wins.forEach(function(w){
+          var li = document.createElement('li'); li.textContent = w.name;
+          if (state.wins.indexOf(w) === lastWin) li.className = 'new';
+          ol.appendChild(li);
+        });
+        box.appendChild(ol);
+      } else {
+        var n = document.createElement('div'); n.className = 'none'; n.textContent = '還沒抽'; box.appendChild(n);
+      }
+      g.appendChild(box);
+    });
+  }
+
+  function showWho(text, cls){
+    var reel = $('reel');
+    reel.className = 'reel' + (cls ? ' ' + cls : '');
+    reel.innerHTML = '';
+    var d = document.createElement('div'); d.className = 'who'; d.id = 'who'; d.textContent = text;
+    reel.appendChild(d);
+  }
+
+  function draw(){
+    var cur = currentPrize(), pl = pool();
+    if (!cur || !pl.length || rolling) return;
+    rolling = true; lastWin = -1; render();
+    var winner = pl[randInt(pl.length)];
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var steps = reduce ? 1 : 28, i = 0;
+    (function tick(){
+      if (i < steps - 1){
+        showWho(pl[randInt(pl.length)], 'rolling');
+        i++;
+        setTimeout(tick, 50 + Math.pow(i / steps, 3) * 320);
+      } else {
+        state.wins.push({ prize:cur.idx, name:winner });
+        lastWin = state.wins.length - 1;
+        save(); rolling = false;
+        showWho(winner, 'won');
+        if (!reduce) confetti();
+        render();
+      }
+    })();
+  }
+
+  function redraw(){
+    if (lastWin < 0) return;
+    var w = state.wins.splice(lastWin, 1)[0];
+    // 被取消的人放回去也不公平(例如聯絡不到),所以只拿掉這筆、重抽同一個獎
+    (state.skipped = state.skipped || []).push(w.name);
+    lastWin = -1; save();
+    draw();
+  }
+  // 重抽時被取消的人不再回到名單
+  var basePool = pool;
+  pool = function(){
+    var p = basePool(), sk = state.skipped || [];
+    return p.filter(function(n){ return sk.indexOf(n) < 0; });
+  };
+
+  function resultText(){
+    return parsePrizes().map(function(p, i){
+      var names = state.wins.filter(function(w){ return w.prize === i; }).map(function(w){ return w.name; });
+      return '【' + p.name + '】' + (names.length ? names.join('、') : '(未抽)');
+    }).join('\n');
+  }
+  function toast(msg){
+    var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 1800);
+  }
+  function copy(){
+    var txt = resultText(), box = $('copy-box');
+    var done = function(){ toast('已複製中獎名單'); };
+    var fallback = function(){ box.hidden = false; box.value = txt; box.focus(); box.select(); toast('自動複製被擋住了,請手動全選複製下面的文字'); };
+    try { navigator.clipboard.writeText(txt).then(done, fallback); } catch(e){ fallback(); }
+  }
+
+  function apply(force){
+    if (state.wins.length && !force){ $('confirm').hidden = false; return; }
+    state.names = $('names').value; state.prizes = $('prizes').value;
+    state.dedupe = $('opt-dedupe').checked; state.once = $('opt-once').checked;
+    state.wins = []; state.skipped = []; lastWin = -1;
+    $('confirm').hidden = true; save();
+    showWho('按下按鈕開始抽', ''); $('who').className = 'idle';
+    render(); toast('已套用');
+  }
+
+  // 彩帶
+  function confetti(){
+    var c = $('confetti'), ctx = c.getContext('2d');
+    c.width = innerWidth; c.height = innerHeight;
+    var colors = ['#a5243d','#ffc0be','#ffdc5c','#ffffff','#ffd6d4'];
+    var ps = [];
+    for (var k = 0; k < 140; k++) ps.push({
+      x:c.width/2 + (Math.random()-.5)*120, y:c.height*0.35,
+      vx:(Math.random()-.5)*14, vy:-Math.random()*13-4,
+      r:Math.random()*6+4, a:Math.random()*6, va:(Math.random()-.5)*.3, col:colors[k%colors.length]
+    });
+    var t0 = performance.now();
+    (function frame(t){
+      ctx.clearRect(0,0,c.width,c.height);
+      ps.forEach(function(p){
+        p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle = p.col;
+        ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); ctx.restore();
+      });
+      if (t - t0 < 2600) requestAnimationFrame(frame); else ctx.clearRect(0,0,c.width,c.height);
+    })(t0);
+  }
+
+  $('names').value = state.names; $('prizes').value = state.prizes;
+  $('opt-dedupe').checked = state.dedupe; $('opt-once').checked = state.once;
+  $('draw-btn').onclick = draw;
+  $('redraw-btn').onclick = redraw;
+  $('copy-btn').onclick = copy;
+  $('apply-btn').onclick = function(){ apply(false); };
+  $('confirm-yes').onclick = function(){ apply(true); };
+  $('confirm-no').onclick = function(){ $('confirm').hidden = true; };
+  if (state.wins.length){ var w = state.wins[state.wins.length-1]; showWho(w.name, 'won'); }
+  if (state.names === SAMPLE_NAMES) $('setup').open = true;
+  render();
+})();
+</script>
+</body>
+</html>
