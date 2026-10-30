@@ -141,12 +141,12 @@
     <div class="setup-body">
       <div class="cols">
         <div class="field">
-          <label for="names">客人名單 <span class="sample" id="names-sample">範例</span></label>
+          <label for="names">客人名單</label>
           <p class="hint">一行一位。同一位客人寫兩次,就是兩次機會(除非勾下面的「同名只算一次」)。</p>
           <textarea id="names"></textarea>
         </div>
         <div class="field">
-          <label for="prizes">獎品 <span class="sample" id="prizes-sample">範例</span></label>
+          <label for="prizes">獎品</label>
           <p class="hint">一行一種獎品,後面空一格寫數量,例如「購物金200元 3」。沒寫數量就是 1 份。照順序由上往下抽。</p>
           <textarea id="prizes"></textarea>
         </div>
@@ -171,9 +171,9 @@
 
 <script>
 (function(){
-  var SAMPLE_NAMES = ['王小美','林佳穎','陳怡君','張雅婷','李思妤','黃郁晴','吳欣怡','蔡佩珊','鄭宜蓁','許筱涵','周芷若','謝語彤'].join('\n');
-  var SAMPLE_PRIZES = ['花結購物金500元 1','花結購物金200元 2','日本限定小禮物 3'].join('\n');
-  var KEY = 'hanajie-lottery-v1';
+  var SAMPLE_NAMES = ["berry", "Tin chain", "Tina Wang", "Amber 郭貞里", "Фаина 品淳", "彤", "兔兔", "小薇", "慧思", "三隻小豬", "yujie✿", "珺珺珽", "Penny Chen", "李靜瑩", "宛真", "陳雅晴", "張栩榛Ivy", "端", "Emma", "薏靜", "簡妤瑄cyx", "婕妤Queena👑", "李芳容", "文馨🍒", "家菱", "謝佳恩Grace", "Melissa", "Weina", "劉采萱", "Kimi", "佩微", "香魚-綺恩/芝瑄/榮軒", "Jenny L. 梁安安", "紫筠", "蝶々🦋", "Ko", "Anthea", "霈芯", "Rascal玖²", "Serena Lin", "Cindy", "姿瑜", "林頻禧", "C", "Rita", "Han", "Hebe❤️(INO)", "敏 Mindy", "李芸玲", "咨妤", "Angela Wu", "黃心妮", "沂蓁", "黃若婷", "Melody 謝郁玟", "安", "潔英", "Yi", "游孜晴", "Sandy", "田詠欣", "Arielyang", "Sarah", "毓翎", "YUMI🌹", "Ying", "陳姵穎", "卜亭芸", "Minn", "羅婉麗Lori", "Meko", "Yiti", "陳媽媽", "\u003c蕭>", "梁安安", "U婷", "Rose", "cin", "雅端", "Angel chang", "Julie", "臻", "Ying"].join('\n');
+  var SAMPLE_PRIZES = ["An Mille 粉色冷水杯 1", "An Mille 粉色包包 2", "An Mille 黑白條紋包包 1", "Darich黑色包包 1", "Lilybrown保溫瓶 1"].join('\n');
+  var KEY = 'hanajie-lottery-v2';
 
   var $ = function(id){ return document.getElementById(id); };
   var state = load() || { names:SAMPLE_NAMES, prizes:SAMPLE_PRIZES, dedupe:true, once:true, wins:[] };
@@ -225,8 +225,6 @@
     $('pool').textContent = '還有 ' + pl.length + ' 個機會可以抽中 · 共 ' + parseNames().length + ' 個';
     $('draw-btn').disabled = rolling || !cur || pl.length === 0;
     $('redraw-btn').hidden = rolling || lastWin < 0;
-    $('names-sample').hidden = state.names !== SAMPLE_NAMES;
-    $('prizes-sample').hidden = state.prizes !== SAMPLE_PRIZES;
 
     var g = $('groups'); g.innerHTML = '';
     if (!prizes.length){ g.innerHTML = '<p class="empty">先在下面設定獎品。</p>'; return; }
@@ -356,7 +354,6 @@
   $('confirm-yes').onclick = function(){ apply(true); };
   $('confirm-no').onclick = function(){ $('confirm').hidden = true; };
   if (state.wins.length){ var w = state.wins[state.wins.length-1]; showWho(w.name, 'won'); }
-  if (state.names === SAMPLE_NAMES) $('setup').open = true;
   render();
 })();
 </script>
