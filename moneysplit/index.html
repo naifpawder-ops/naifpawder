@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>北義之旅分帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* layout: 一欄閱讀,上方結論卡 → 分頁(誰付給誰 / 共同花費 / 媽媽個人) */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#1d2a2c; --muted:#5d6d70; --line:#d5dedd;
+  --lagoon:#1f6a6f; --lagoon-soft:#e1efee;
+  --mian:#1f6a6f; --ping:#7a4a86; --mom:#b07a12; --meng:#4f6a8f;
+  --warn:#9a5b00; --warn-bg:#fff3dd; --dup-bg:#eef1f6;
+  --display:"Noto Serif TC","Songti TC",serif; --body:"Noto Sans TC","PingFang TC",system-ui,sans-serif; --num:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121a1b; --surface:#1a2526; --ink:#e3ecea; --muted:#9db0ae; --line:#2e3d3e;
+  --lagoon:#6cc2c3; --lagoon-soft:#1f3233; --mian:#6cc2c3; --ping:#c79bd2; --mom:#e3b65a; --meng:#9bb4d8;
+  --warn:#f0b866; --warn-bg:#33270f; --dup-bg:#1f2836; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a1b; --surface:#1a2526; --ink:#e3ecea; --muted:#9db0ae; --line:#2e3d3e;
+  --lagoon:#6cc2c3; --lagoon-soft:#1f3233; --mian:#6cc2c3; --ping:#c79bd2; --mom:#e3b65a; --meng:#9bb4d8;
+  --warn:#f0b866; --warn-bg:#33270f; --dup-bg:#1f2836; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:28px 64px;display:grid;gap:22px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,36px);margin:0;text-wrap:balance;letter-spacing:.02em}
+h2{font-family:var(--display);font-size:20px;margin:0 0 4px;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.people{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;background:var(--surface)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px}
+.hero .big{font-family:var(--num);font-size:clamp(26px,6vw,38px);font-weight:500;color:var(--mom);line-height:1.2}
+.pay{display:grid;gap:10px}
+.payrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;padding:10px 12px;border-radius:10px;background:var(--lagoon-soft)}
+.payrow b{font-weight:700}
+.payrow .note{grid-column:1/-1;color:var(--muted);font-size:13px}
+.rate{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.rate input{width:84px;font:inherit;font-family:var(--num);padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.rate input:focus-visible,.tabs button:focus-visible,select:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line);padding-bottom:8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:2;padding-top:8px}
+.tabs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--lagoon);border-color:var(--lagoon);color:var(--bg);font-weight:700}
+section{display:grid;gap:14px}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.05em;background:var(--surface);position:sticky;top:0}
+td.r,th.r{text-align:right}
+tr.day td{background:var(--bg);font-weight:700;color:var(--muted);font-size:13px}
+tfoot td{font-weight:700;border-bottom:0}
+.who{color:var(--c);font-weight:700}
+.time{color:var(--muted);font-size:12px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:14px}
+select{font:inherit;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:2px}
+.card .k{font-size:13px;color:var(--muted)}
+.card .v{font-family:var(--num);font-size:20px}
+.item{border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.item.warn{background:var(--warn-bg)}
+.item.dup{background:var(--dup-bg)}
+.item h3{margin:0;font-size:15px}
+.item p{margin:0;color:var(--ink)}
+.item .label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--warn)}
+.item.dup .label{color:var(--meng)}
+.check{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.tabs button{transition:background .15s}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1>北義之旅分帳</h1>
+    <p class="sub">2026/9/28–10/12 · 米蘭、多洛米蒂、威尼斯、佛羅倫斯、比薩、五漁村 · 四人同行</p>
+  </header>
+  <div class="people" aria-label="成員">
+    <span class="tag" style="--c:var(--mom)"><span class="dot"></span>小綿(媽媽,記帳的人)</span>
+    <span class="tag" style="--c:var(--ping)"><span class="dot"></span>詩萍</span>
+    <span class="tag" style="--c:var(--meng)"><span class="dot"></span>夢</span>
+    <span class="tag" style="--c:var(--mian)"><span class="dot"></span>小美</span>
+  </div>
+
+  <div class="hero">
+    <div>
+      <div class="check">全部換成台幣,只要匯這 4 筆就結清</div>
+      <div class="big" id="heroAmt"></div>
+      <div class="check" id="heroSub"></div>
+    </div>
+    <div class="pay" id="twdPay"></div>
+    <div class="rate"><label for="rate">換算匯率:1 歐元 =</label><input id="rate" type="number" step="any" min="0" value="36.93585"><span>台幣</span></div>
+    <p class="check" style="margin:0">匯率怎麼來:台灣銀行歐元「即期賣出」9/26–10/11 最高是 <b>9/29 的 36.39</b>,再加 1.5% 海外手續費 → 36.39 × 1.015 = <b>36.936</b>。改上面的數字,所有台幣金額會跟著變。</p>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="settle" aria-selected="true">四人怎麼結清</button>
+    <button role="tab" data-tab="shared" aria-selected="false">共同花費明細</button>
+    <button role="tab" data-tab="mom" aria-selected="false">媽媽個人花費</button>
+  </nav>
+
+  <section id="tab-settle">
+    <div><h2>每個人付了多少、該分多少</h2><p class="sub">共同花費都是四個人平分(訊息裡寫「四人」「每人」的金額都跟除以 4 一致)。歐元和台幣分開算,不先換匯。</p></div>
+    <div class="tablebox"><table id="balTable"></table></div>
+    <div><h2>最簡單的還錢方式</h2><p class="sub">每個人把「別人幫你付的那 1/4」還給付錢的人;媽媽和詩萍之間互相抵掉。</p></div>
+    <div class="pay" id="allPay"></div>
+    <div><h2>一筆一筆照原本歐元算的台幣版</h2><p class="sub">如果想照上面每一筆分開匯,換成台幣是這樣(每個人總額跟最上面一樣)。</p></div>
+    <div class="pay" id="pairTwd"></div>
+  </section>
+
+  <section id="tab-shared" hidden>
+    <div><h2>共同花費 <span class="num" id="sharedCount"></span></h2><p class="sub">已經去掉重複的訊息。「訊息時間」是那則訊息傳出的時間,方便你回去對照。</p></div>
+    <div class="filters">
+      <label for="fPayer">付款人</label>
+      <select id="fPayer"><option value="">全部</option><option>小綿</option><option>詩萍</option></select>
+    </div>
+    <div class="tablebox"><table id="sharedTable"></table></div>
+  </section>
+
+  <section id="tab-mom" hidden>
+    <div><h2>媽媽(小綿)自己的花費</h2><p class="sub">訊息前面有「$」的是她自己買的,不用跟別人分。這部分只是讓你知道她自己花了多少。</p></div>
+    <div class="cards" id="momCards"></div>
+    <div class="tablebox"><table id="momTable"></table></div>
+  </section>
+
+</div>
+
+<script>
+const DATA = {"shared": [["9/28", "米蘭住宿城市稅", 38, "EUR", "小綿", "刷卡", "9/30 下午5:19"], ["9/29", "往卡雷扎湖高速公路過路費 €12.9+€2", 14.9, "EUR", "小綿", "刷卡", "9/30 下午5:20"], ["9/29", "卡雷扎湖汽車停車費", 8, "EUR", "小綿", "現金", "9/30 下午5:23"], ["9/29", "維羅納停車 11:39-12:42", 2, "EUR", "小綿", "現金", "10/4 凌晨3:09"], ["9/29", "租車全險+異地還車", 350.75, "EUR", "詩萍", "信用卡", "10/6 下午5:03"], ["9/30", "阿拉巴 阿爾盆羅斯三星住宿城市稅", 8, "EUR", "小綿", "刷卡", "9/30 下午5:24"], ["9/30", "鰲峰山(刀鋒山)纜車來回 四人", 296, "EUR", "小綿", "刷卡", "9/30 下午5:24"], ["9/30", "刀鋒山第三停車場停車費", 17.5, "EUR", "小綿", "刷卡", "9/30 晚上7:59"], ["9/30", "坎皮泰洛迪法薩城市稅", 4, "EUR", "小綿", "現金", "10/1 凌晨12:28"], ["9/30", "晚餐 牛排、蔬菜、奶酒", 34.75, "EUR", "小綿", "刷卡", "10/1 凌晨1:53"], ["10/1", "Campitella-Col Rodella 來回纜車票", 120, "EUR", "小綿", "刷卡", "10/1 下午5:39"], ["10/1", "薩索倫戈山 棺材纜車門票", 180, "EUR", "小綿", "刷卡", "10/1 晚上9:34"], ["10/1", "薩索倫戈山 棺材纜車停車費", 12, "EUR", "小綿", "刷卡", "10/1 晚上9:34"], ["10/1", "加油 28.24 公升", 70, "EUR", "小綿", "刷卡", "10/1 晚上10:35"], ["10/1", "超市買3日早晚餐", 53.89, "EUR", "小綿", "刷卡", "10/2 凌晨12:42"], ["10/1", "佛羅倫斯二晚城市稅", 50.53, "EUR", "小綿", "刷卡", "10/2 凌晨3:50"], ["10/2", "科爾蒂納丹佩佐 平價超市", 12.75, "EUR", "小綿", "刷卡", "10/3 凌晨1:11"], ["10/3", "布萊埃斯湖第四停車場 停車費", 17, "EUR", "小綿", "刷卡", "10/3 下午6:26"], ["10/3", "多布拉亞克湖停車費", 2, "EUR", "小綿", "刷卡", "10/3 晚上7:42"], ["10/3", "科爾蒂納老城區停車1.5小時", 2, "EUR", "小綿", "刷卡", "10/4 凌晨12:39"], ["10/3", "科爾蒂納 Eurospin 平價超商補貨", 4.16, "EUR", "小綿", "刷卡", "10/4 凌晨12:39"], ["10/3", "聖維托迪卡多雷三晚城市稅", 12, "EUR", "小綿", "現金", "10/4 凌晨3:09"], ["10/4", "往威尼斯高速公路過路費", 8.7, "EUR", "小綿", "刷卡", "10/4 下午4:07"], ["10/4", "威尼斯車站加滿油", 40, "EUR", "小綿", "現金", "10/5 清晨5:06"], ["10/4", "威尼斯水上巴士", 38, "EUR", "小綿", "刷卡", "10/5 清晨5:10"], ["10/4", "威尼斯梅斯特搭火車至住處", 244, "TWD", "詩萍", "Line Pay", "10/5 清晨5:11"], ["10/4", "威尼斯超市早晚餐", 46.58, "EUR", "詩萍", "刷卡", "10/5 清晨5:17"], ["10/4-5", "威尼斯 Cannaregio 3009 兩晚城市稅 €16×2", 32, "EUR", "詩萍", "現金", "10/6 下午4:32"], ["10/5", "水上巴士 玻璃島、彩色島、麗都一日票", 100, "EUR", "詩萍", "刷卡", "10/5 晚上10:13"], ["10/5", "麗都島四輪鐵馬1小時", 20, "EUR", "詩萍", "刷卡", "10/5 晚上11:45"], ["10/7", "佛羅倫斯 戰斧牛排", 100.5, "EUR", "小綿", "刷卡", "10/7 晚上8:36"], ["10/7", "巴士前往菲耶索萊山丘", 8, "EUR", "小綿", "刷卡", "10/7 晚上8:36"], ["10/7", "菲耶索萊搭巴士回火車站", 8, "EUR", "小綿", "刷卡", "10/7 晚上11:14"], ["10/8", "前往比薩斜塔火車 四人(含手續費)", 1588, "TWD", "詩萍", "Apple Pay", "10/8 下午4:24"], ["10/8", "比薩斜塔搭公車到比薩車站", 8, "EUR", "小綿", "刷卡", "10/8 晚上8:51"], ["10/8", "比薩車站前往五漁村", 50, "EUR", "詩萍", "刷卡", "10/8 晚上8:51"], ["10/8", "Monterosso 五漁村火車兩日券", 146, "EUR", "小綿", "刷卡", "10/8 晚上10:16"], ["10/9", "韋爾納扎多里亞城堡門票", 10, "EUR", "小綿", "刷卡", "10/10 凌晨4:27"], ["10/10", "五漁村兩日城市稅", 24, "EUR", "小綿", "現金", "10/10 下午1:03"], ["10/10", "火車至拉斯佩齊亞中央車站", 32, "EUR", "詩萍", "刷卡", "10/10 下午1:03"], ["10/10", "兩段火車票到佛羅倫斯(線上)", 3881, "TWD", "詩萍", "刷卡", "10/10 下午1:51"], ["10/10", "米蘭飯店接駁車", 20, "EUR", "小綿", "刷卡", "10/11 凌晨12:55"], ["10/11", "米蘭飯店接駁至米蘭機場", 20, "EUR", "小綿", "刷卡", "10/11 上午11:04"], ["10/11", "城市稅", 8, "EUR", "詩萍", "—", "10/11 上午11:08"]], "personal": [["9/29", "巴士米蘭車站來回", 16], ["9/29", "麥當勞", 10.6], ["9/29", "優格", 1.25], ["9/29", "氣泡水", 0.33], ["9/29", "生菜、蘋果", 3.38], ["9/29", "優格、小米飯", 6.29], ["9/29", "麵包", 4], ["9/29", "義式堅果冰淇淋", 5], ["10/1", "晚餐&明早餐", 13.59], ["10/1", "香料調味、優格", 11.95], ["10/2", "奶酒、可頌、優格", 15.94], ["10/3", "奶酒、可頌、優格", 20.05], ["10/4", "水蜜桃", 1.8], ["10/4", "登山鞋(世華) €210 打七折", 147], ["10/5", "義大利包(現金 50+10+33+18+18)", 135], ["10/5", "優格、可頌", 4.19], ["10/6", "保溫瓶", 15], ["10/6", "太陽眼鏡", 10], ["10/7", "口紅", 8.99], ["10/7", "餅乾", 1], ["10/7", "披薩", 7.32], ["10/7", "烤雞", 9.9], ["10/7", "香料", 10], ["10/7", "冰淇淋", 8], ["10/7", "香料", 10], ["10/7", "果醬、優格", 3.99], ["10/7", "烤雞、優格", 12.89], ["10/7", "義式濃縮咖啡", 8], ["10/7", "藍莓蛋糕", 7], ["10/7", "冰淇淋", 3], ["10/8", "芒果、酪梨", 3.5], ["10/8", "可頌", 1.5], ["10/9", "優格、生菜", 7.9], ["10/9", "口紅", 6.99], ["10/9", "優格", 1.7], ["10/9", "檸檬冰", 7], ["10/10", "可頌", 3], ["10/10", "中央市場披薩", 20.46], ["10/11", "晚餐自己的份(現金給詩萍)", 18.5], ["10/11", "免稅商店奶酒 17.9+11.5+10.5", 39.9], ["10/11", "免稅商店奶酒(她寫 42*07=31.6)", 31.6], ["10/12", "免稅店奶酒", 39.15]]};
+const P = {小綿:'--mom', 詩萍:'--ping', 夢:'--meng', 小美:'--mian'};
+const PEOPLE = ['小綿','詩萍','夢','小美'];
+const eur = n => '€' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const twd = n => 'NT$' + n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+const r2 = n => Math.round(n*100)/100;
+const who = p => `<span class="who" style="--c:var(${P[p]||'--muted'})">${p}</span>`;
+const fmt = (a,c) => c==='EUR'?eur(a):twd(a);
+let rate = 36.93585;
+try{ const s = localStorage.getItem('eu-rate2'); if(s) rate = +s; }catch(e){}
+document.getElementById('rate').value = rate;
+
+const shared = DATA.shared.map(x=>({date:x[0],what:x[1],amt:x[2],cur:x[3],payer:x[4],how:x[5],time:x[6]}));
+const paid = {EUR:{},TWD:{}}, tot={EUR:0,TWD:0};
+shared.forEach(s=>{paid[s.cur][s.payer]=(paid[s.cur][s.payer]||0)+s.amt; tot[s.cur]+=s.amt;});
+const share = {EUR:tot.EUR/4, TWD:tot.TWD/4};
+// 每個人欠付款人的 1/4
+const owe = (payer,cur) => r2((paid[cur][payer]||0)/4);
+
+function render(){
+  const toMom = owe('小綿','EUR'), toPing = owe('詩萍','EUR'), twdPing = owe('詩萍','TWD'), net = r2(toMom-toPing);
+  const momNetE = r2((paid.EUR['小綿']||0)-share.EUR);
+  const row = (a,b,amt,note) => `<div class="payrow"><span>${who(a)} → ${who(b)}</span><span class="num">${amt}</span><span class="note">${note}</span></div>`;
+  const momNetT = momNetE*rate - share.TWD;
+  const pingNetT = ((paid.EUR['詩萍']||0)-share.EUR)*rate + (paid.TWD['詩萍']||0) - share.TWD;
+  const eachT = share.EUR*rate + share.TWD;
+  const R = n => twd(Math.round(n));
+  document.getElementById('heroAmt').textContent = '夢、小美 各付 ' + R(eachT);
+  document.getElementById('heroSub').textContent = `媽媽共收 ${R(momNetT)} · 詩萍共收 ${R(pingNetT)} · 詩萍和媽媽之間互抵,不用互匯`;
+  document.getElementById('twdPay').innerHTML =
+    row('夢','小綿',R(momNetT/2),'媽媽要收的錢,夢和小美各出一半') +
+    row('夢','詩萍',R(pingNetT/2),'詩萍要收的錢,夢和小美各出一半') +
+    row('小美','小綿',R(momNetT/2),'同上') +
+    row('小美','詩萍',R(pingNetT/2),'同上');
+  document.getElementById('pairTwd').innerHTML =
+    row('夢','小綿',R(toMom*rate),eur(toMom)+' × 匯率') +
+    row('小美','小綿',R(toMom*rate),'同上') +
+    row('詩萍','小綿',R(net*rate-twdPing),`${eur(net)} × 匯率,再扣掉媽媽欠她的 ${twd(twdPing)}`) +
+    row('夢','詩萍',R(toPing*rate+twdPing),`${eur(toPing)} × 匯率 + ${twd(twdPing)}`) +
+    row('小美','詩萍',R(toPing*rate+twdPing),'同上');
+  const momLines =
+    row('夢','小綿',eur(toMom),`媽媽幫大家付了 ${eur(r2(paid.EUR['小綿']))},每人分 1/4`) +
+    row('小美','小綿',eur(toMom),'同上') +
+    row('詩萍','小綿',eur(net),`互抵後:詩萍欠媽媽 ${eur(toMom)},媽媽欠詩萍 ${eur(toPing)}(詩萍幫大家付了 ${eur(r2(paid.EUR['詩萍']))}),相減剩 ${eur(net)}`) +
+    row('小綿','詩萍',twd(twdPing),`詩萍刷了 ${twd(paid.TWD['詩萍'])} 的台幣火車票,媽媽分 1/4(也可以換成歐元從上面那筆扣掉)`);
+  
+  let h = '<thead><tr><th>成員</th><th class="r">幫大家付了(€)</th><th class="r">應分攤(€)</th><th class="r">歐元結餘</th><th class="r">幫大家付了(NT$)</th><th class="r">應分攤(NT$)</th><th class="r">台幣結餘</th></tr></thead><tbody>';
+  PEOPLE.forEach(p=>{
+    const pe=paid.EUR[p]||0, pt=paid.TWD[p]||0, be=r2(pe-share.EUR), bt=r2(pt-share.TWD);
+    const sign = v => v>0?'要收回 ':v<0?'要付出 ':'';
+    h += `<tr><td>${who(p)}</td><td class="r num">${eur(pe)}</td><td class="r num">${eur(r2(share.EUR))}</td><td class="r num">${sign(be)}${eur(Math.abs(be))}</td><td class="r num">${twd(pt)}</td><td class="r num">${twd(r2(share.TWD))}</td><td class="r num">${sign(bt)}${twd(Math.abs(bt))}</td></tr>`;
+  });
+  h += `</tbody><tfoot><tr><td>合計</td><td class="r num">${eur(r2(tot.EUR))}</td><td class="r num">${eur(r2(tot.EUR))}</td><td></td><td class="r num">${twd(tot.TWD)}</td><td class="r num">${twd(tot.TWD)}</td><td></td></tr></tfoot>`;
+  document.getElementById('balTable').innerHTML = h;
+  document.getElementById('allPay').innerHTML = momLines +
+    row('夢','詩萍',eur(toPing)+' + '+twd(twdPing),'詩萍幫大家付的 1/4') +
+    row('小美','詩萍',eur(toPing)+' + '+twd(twdPing),'同上');
+}
+
+function renderShared(){
+  const f = document.getElementById('fPayer').value;
+  const rows = shared.filter(s=>!f||s.payer===f);
+  document.getElementById('sharedCount').textContent = `· ${rows.length} 筆`;
+  let h = '<thead><tr><th>日期</th><th>項目</th><th class="r">金額</th><th>誰付</th><th class="r">每人 1/4</th><th>訊息時間</th></tr></thead><tbody>';
+  let last='';
+  const sum={EUR:0,TWD:0};
+  rows.forEach(s=>{
+    if(s.date!==last){h+=`<tr class="day"><td colspan="6">${s.date}</td></tr>`;last=s.date;}
+    sum[s.cur]+=s.amt;
+    h+=`<tr><td class="num">${s.date}</td><td>${s.what}</td><td class="r num">${fmt(s.amt,s.cur)}</td><td>${who(s.payer)} <span class="time">${s.how}</span></td><td class="r num">${fmt(r2(s.amt/4),s.cur)}</td><td class="time">${s.time}</td></tr>`;
+  });
+  h+=`</tbody><tfoot><tr><td></td><td>合計</td><td class="r num">${eur(r2(sum.EUR))}<br>${twd(sum.TWD)}</td><td></td><td class="r num">${eur(r2(sum.EUR/4))}<br>${twd(r2(sum.TWD/4))}</td><td></td></tr></tfoot>`;
+  document.getElementById('sharedTable').innerHTML = h;
+}
+
+function renderMom(){
+  const items = DATA.personal; const t = r2(items.reduce((a,x)=>a+x[2],0));
+  const byDay = {}; items.forEach(x=>byDay[x[0]]=(byDay[x[0]]||0)+x[2]);
+  const top = Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('momCards').innerHTML =
+    `<div class="card"><span class="k">個人花費(歐元)</span><span class="v">${eur(t)}</span></div>
+     <div class="card"><span class="k">另外刷台幣</span><span class="v">${twd(300.32)}</span><span class="k">10/9 披薩</span></div>
+     <div class="card"><span class="k">約合台幣</span><span class="v">${twd(Math.round(t*rate+300.32))}</span></div>
+     <div class="card"><span class="k">花最多的一天</span><span class="v">${top[0]}</span><span class="k">${eur(r2(top[1]))}(多半是包包)</span></div>`;
+  let h='<thead><tr><th>日期</th><th>項目</th><th class="r">歐元</th></tr></thead><tbody>'; let last='';
+  items.forEach(x=>{ if(x[0]!==last){h+=`<tr class="day"><td colspan="3">${x[0]} · 小計 ${eur(r2(byDay[x[0]]))}</td></tr>`;last=x[0];}
+    h+=`<tr><td class="num">${x[0]}</td><td>${x[1]}</td><td class="r num">${eur(x[2])}</td></tr>`;});
+  h+=`<tr><td class="num">10/9</td><td>披薩(刷台幣)</td><td class="r num">${twd(300.32)}</td></tr>`;
+  h+=`</tbody><tfoot><tr><td></td><td>合計</td><td class="r num">${eur(t)}</td></tr></tfoot>`;
+  document.getElementById('momTable').innerHTML=h;
+}
+
+
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  ['settle','shared','mom'].forEach(t=>document.getElementById('tab-'+t).hidden = t!==b.dataset.tab);
+  try{localStorage.setItem('eu-tab',b.dataset.tab)}catch(e){}
+}));
+document.getElementById('fPayer').addEventListener('change',renderShared);
+document.getElementById('rate').addEventListener('input',e=>{rate=+e.target.value||0;try{localStorage.setItem('eu-rate2',rate)}catch(err){} render();renderMom();});
+render(); renderShared(); renderMom();
+try{const t=localStorage.getItem('eu-tab'); if(t) document.querySelector(`.tabs button[data-tab="${t}"]`)?.click();}catch(e){}
+</script>
+
+</body>
+</html>
