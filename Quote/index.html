@@ -1,0 +1,341 @@
+<title>花結報價機</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #fff5f4;
+    --card: #ffffff;
+    --peach: #ffc0be;
+    --peach-soft: #ffe3e1;
+    --yellow: #ffdc5c;
+    --wine: #a5243d;
+    --wine-deep: #7c1a2e;
+    --ink: #5a1f2b;
+    --muted: #b08a90;
+    --line: #f6d9d7;
+    --morandi: #b5754b;
+    --shadow: 0 18px 40px -22px rgba(165, 36, 61, 0.35);
+  }
+  :root[data-theme="dark"] {
+    --bg: #241114;
+    --card: #341a1f;
+    --peach-soft: #43232a;
+    --ink: #fbe6e6;
+    --muted: #c99aa0;
+    --line: #4a262c;
+    --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.6);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #241114;
+      --card: #341a1f;
+      --peach-soft: #43232a;
+      --ink: #fbe6e6;
+      --muted: #c99aa0;
+      --line: #4a262c;
+      --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 48px;
+  }
+  .page { width: 100%; max-width: 440px; }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .brand .mark {
+    font-size: 26px;
+    letter-spacing: 0.04em;
+  }
+  .brand h1 {
+    font-family: "Noto Serif TC", serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 6px 0 4px;
+    color: var(--wine);
+    text-wrap: balance;
+  }
+  .brand p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 24px 22px 22px;
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--wine);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .price-input-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 10px 16px;
+    transition: border-color 0.15s ease;
+  }
+  .price-input-row:focus-within { border-color: var(--wine); }
+  .price-input-row .yen { font-size: 20px; color: var(--muted); font-weight: 700; }
+  .price-input-row input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "Noto Serif TC", serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .price-input-row input::placeholder { color: var(--line); font-weight: 400; }
+  .price-input-row .yen-suffix { font-size: 13px; color: var(--muted); }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  .toggle-row {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--peach-soft);
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .toggle-row span { font-size: 13px; }
+  .switch {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    flex: none;
+  }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .track {
+    position: absolute; inset: 0;
+    background: var(--line);
+    border-radius: 999px;
+    transition: background 0.15s ease;
+  }
+  .switch .thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease;
+  }
+  .switch input:checked + .track { background: var(--wine); }
+  .switch input:checked ~ .thumb { transform: translateX(18px); }
+
+  .results { display: grid; gap: 12px; }
+  .result-card {
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .result-card.daiding { background: linear-gradient(135deg, var(--wine), var(--wine-deep)); }
+  .result-card.lianxian { background: linear-gradient(135deg, var(--morandi), #8f5836); }
+  .result-card .tag {
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .result-card .amount {
+    color: #fff;
+    font-family: "Noto Serif TC", serif;
+    font-size: 30px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-card .sub { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }
+  .result-card .copy-btn {
+    flex: none;
+    border: 1.5px solid rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+  }
+  .result-card .copy-btn:active { background: rgba(255,255,255,0.28); }
+
+  .empty-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 18px 8px 6px;
+  }
+
+  .footer-card {
+    background: var(--peach-soft);
+    border-radius: 20px;
+    padding: 18px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .footer-card b { color: var(--wine); }
+
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 28px;
+    transform: translate(-50%, 16px);
+    background: var(--wine);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px -8px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+
+<div class="page">
+  <div class="brand">
+    <div class="mark">🎀</div>
+    <h1>花結日幣報價機</h1>
+    <p>網站抓不到價格時，自己輸入含稅價格馬上換算</p>
+  </div>
+
+  <div class="card">
+    <div class="field-label">💴 日幣含稅價格</div>
+    <div class="price-input-row">
+      <span class="yen">¥</span>
+      <input id="jpyInput" type="number" inputmode="numeric" min="0" placeholder="例如 19800" />
+      <span class="yen-suffix">円</span>
+    </div>
+    <div class="hint">看網站上商品頁標示的「税込」價格，直接輸入數字就好（不用輸入逗號）</div>
+
+    <div class="toggle-row">
+      <span>這是鞋子或包包嗎？</span>
+      <label class="switch">
+        <input id="shoeToggle" type="checkbox" />
+        <span class="track"></span>
+        <span class="thumb"></span>
+      </label>
+    </div>
+  </div>
+
+  <div id="resultsWrap">
+    <div class="empty-note">輸入價格後，代訂／連線報價會出現在這裡 🎀</div>
+  </div>
+
+  <div class="footer-card">
+    確定要買的話，直接在 LINE 聊天室跟我們留言<b>顏色</b>／<b>尺寸</b>就可以囉 💌
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var jpyInput = document.getElementById('jpyInput');
+  var shoeToggle = document.getElementById('shoeToggle');
+  var resultsWrap = document.getElementById('resultsWrap');
+  var toastEl = document.getElementById('toast');
+
+  function roundUp10(n) { return Math.ceil(n / 10) * 10; }
+
+  // 跟 LINE 機器人完全同一套公式(worker.js 的 daiDingSuggestedPrice_ /
+  // lianxianSuggestedPrice_ / isShoeOrBagItem_)，兩邊算出來的數字才會一致。
+  function daidingPrice(jpy, isShoe) {
+    if (!jpy) return 0;
+    if (isShoe) return roundUp10(jpy * 0.25);
+    var price = Math.round(jpy * 0.245);
+    if (jpy < 10000) price += 200;
+    return roundUp10(price);
+  }
+  function lianxianPrice(jpy, isShoe) {
+    if (!jpy) return 0;
+    if (isShoe) return roundUp10(jpy * 0.25);
+    var price = Math.round(jpy * 0.238);
+    if (jpy < 10000) price += 200;
+    return roundUp10(price);
+  }
+  function money(n) { return '$' + n.toLocaleString('en-US'); }
+
+  function render() {
+    var jpy = Number(jpyInput.value);
+    if (!jpy || jpy <= 0) {
+      resultsWrap.innerHTML = '<div class="empty-note">輸入價格後，代訂／連線報價會出現在這裡 🎀</div>';
+      return;
+    }
+    var isShoe = shoeToggle.checked;
+    var dai = daidingPrice(jpy, isShoe);
+    var lian = lianxianPrice(jpy, isShoe);
+    resultsWrap.innerHTML =
+      '<div class="results">' +
+        '<div class="result-card daiding">' +
+          '<div><div class="tag">代訂價格</div><div class="amount">' + money(dai) + '</div><div class="sub">日幣 ¥' + jpy.toLocaleString('en-US') + '</div></div>' +
+          '<button class="copy-btn" data-copy="代訂 ' + money(dai) + '">複製</button>' +
+        '</div>' +
+        '<div class="result-card lianxian">' +
+          '<div><div class="tag">連線價格</div><div class="amount">' + money(lian) + '</div><div class="sub">日幣 ¥' + jpy.toLocaleString('en-US') + '</div></div>' +
+          '<button class="copy-btn" data-copy="連線 ' + money(lian) + '">複製</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  jpyInput.addEventListener('input', render);
+  shoeToggle.addEventListener('change', render);
+
+  var toastTimer = null;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+  }
+
+  resultsWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    var text = btn.getAttribute('data-copy');
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast('已複製：' + text);
+      }).catch(function () {
+        showToast('複製失敗，請手動選取文字');
+      });
+    } catch (err) {
+      showToast('複製失敗，請手動選取文字');
+    }
+  });
+
+  render();
+</script>
