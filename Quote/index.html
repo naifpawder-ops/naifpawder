@@ -128,6 +128,34 @@
     padding: 10px 14px;
   }
   .toggle-row span { font-size: 13px; }
+
+  .site-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--wine);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 18px 0 4px;
+  }
+  .site-hint { font-size: 11.5px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+  .site-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 9px 12px;
+    margin-bottom: 7px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .site-opt:last-child { margin-bottom: 0; }
+  .site-opt input { flex: none; accent-color: var(--wine); width: 16px; height: 16px; }
+  .site-opt .name { flex: 1; font-size: 13px; color: var(--ink); line-height: 1.4; }
+  .site-opt .fee { flex: none; font-size: 12.5px; font-weight: 700; color: var(--morandi); font-variant-numeric: tabular-nums; }
+  .site-opt.selected { border-color: var(--wine); background: var(--peach-soft); }
+  .site-opt.selected .fee { color: var(--wine); }
   .switch {
     position: relative;
     width: 42px;
@@ -250,6 +278,12 @@
         <span class="thumb"></span>
       </label>
     </div>
+
+    <div id="siteSection">
+      <div class="site-label">📦 商品來源網站（只影響代訂價格）</div>
+      <div class="site-hint">這幾個網站代訂會多收一點運費／服務費，選到就自動加進代訂價格，連線價格不受影響。</div>
+      <div id="siteOpts"></div>
+    </div>
   </div>
 
   <div id="resultsWrap">
@@ -267,18 +301,52 @@
   var jpyInput = document.getElementById('jpyInput');
   var shoeToggle = document.getElementById('shoeToggle');
   var resultsWrap = document.getElementById('resultsWrap');
+  var siteOpts = document.getElementById('siteOpts');
   var toastEl = document.getElementById('toast');
 
   function roundUp10(n) { return Math.ceil(n / 10) * 10; }
 
+  // 2026-11-04 新增(闆娘原話:「代訂的部分我要加上這些規則...要是不是
+  // 這幾個網站的 那就不用加上運費沒關係」)——跟 worker.js 的
+  // DAIDING_FLAT_FEE_RULES_ 完全同一份清單，只套用代訂、連線不受影響。
+  // 第一個選項固定是「不是這幾個網站」，代表不加價（預設選這個）。
+  // 2026-11-04 修正(闆娘原話:「這個放在最後面 然後不要寫不加價 其他
+  // 幾個後面也都不要寫加價內容」)——「不是這幾個網站」這個選項移到最後
+  // 一個(但還是預設選取的那個,只是位置換到最後面),所有選項都不顯示
+  // 金額文字,乾淨地只列網站名稱讓客人選。
+  var DEFAULT_SITE_CODE = '';
+  var SITES = [
+    { code: 'palcloset', name: 'Pal Closet', fee: 170 },
+    { code: 'zozotown', name: 'Zozotown', fee: 120 },
+    { code: 'snidel', name: 'Snidel／Lily Brown／USAGI online', fee: 120 },
+    { code: 'evelyn', name: 'evelyn／Án MILLE', fee: 150 },
+    { code: 'rojita', name: 'Rojita', fee: 150 },
+    { code: 'petal', name: 'PETAL ONLINE（COCO DEAL／LILLIAN CARAT）', fee: 70 },
+    { code: 'runway', name: 'RUNWAY channel', fee: 70 },
+    { code: DEFAULT_SITE_CODE, name: '不是這幾個網站', fee: 0 }
+  ];
+  siteOpts.innerHTML = SITES.map(function (s) {
+    var isDefault = s.code === DEFAULT_SITE_CODE;
+    return '<label class="site-opt' + (isDefault ? ' selected' : '') + '" data-code="' + s.code + '">' +
+      '<input type="radio" name="site" value="' + s.code + '"' + (isDefault ? ' checked' : '') + ' />' +
+      '<span class="name">' + s.name + '</span>' +
+      '</label>';
+  }).join('');
+
+  function selectedSite() {
+    var code = (siteOpts.querySelector('input[name="site"]:checked') || {}).value || '';
+    return SITES.filter(function (s) { return s.code === code; })[0] || SITES[0];
+  }
+
   // 跟 LINE 機器人完全同一套公式(worker.js 的 daiDingSuggestedPrice_ /
-  // lianxianSuggestedPrice_ / isShoeOrBagItem_)，兩邊算出來的數字才會一致。
-  function daidingPrice(jpy, isShoe) {
+  // lianxianSuggestedPrice_ / isShoeOrBagItem_ / daiDingFlatFee_)，兩邊
+  // 算出來的數字才會一致。
+  function daidingPrice(jpy, isShoe, flatFee) {
     if (!jpy) return 0;
-    if (isShoe) return roundUp10(jpy * 0.25);
+    if (isShoe) return roundUp10(jpy * 0.25 + flatFee);
     var price = Math.round(jpy * 0.245);
     if (jpy < 10000) price += 200;
-    return roundUp10(price);
+    return roundUp10(price + flatFee);
   }
   function lianxianPrice(jpy, isShoe) {
     if (!jpy) return 0;
@@ -289,19 +357,32 @@
   }
   function money(n) { return '$' + n.toLocaleString('en-US'); }
 
+  // 2026-11-04 修正(闆娘原話:「是鞋子或包包嗎的那個選項改成需給我們
+  // 報價」)——鞋子/包包這個開關原本是「打勾就用 ×0.25 自動算」，改成
+  // 打勾就不自動算了，直接告訴客人這類需要我們人工報價，不要給一個
+  // 可能不準的數字；順便把「商品來源網站」那段也隱藏起來（反正不會
+  // 用到，不是鞋子/包包的運費加價規則）。
+  var siteSection = document.getElementById('siteSection');
   function render() {
     var jpy = Number(jpyInput.value);
+    var isShoe = shoeToggle.checked;
+    siteSection.hidden = isShoe;
+    if (isShoe) {
+      resultsWrap.innerHTML = '<div class="empty-note">鞋子／包包類需要我們幫您另外報價 🙏<br>請直接在 LINE 聊天室留言商品連結或照片給我們就可以囉 🎀</div>';
+      return;
+    }
     if (!jpy || jpy <= 0) {
       resultsWrap.innerHTML = '<div class="empty-note">輸入價格後，代訂／連線報價會出現在這裡 🎀</div>';
       return;
     }
-    var isShoe = shoeToggle.checked;
-    var dai = daidingPrice(jpy, isShoe);
-    var lian = lianxianPrice(jpy, isShoe);
+    var site = selectedSite();
+    var dai = daidingPrice(jpy, false, site.fee);
+    var lian = lianxianPrice(jpy, false);
+    var daiSub = '日幣 ¥' + jpy.toLocaleString('en-US') + (site.fee ? '　已加 ' + site.name + ' $' + site.fee : '');
     resultsWrap.innerHTML =
       '<div class="results">' +
         '<div class="result-card daiding">' +
-          '<div><div class="tag">代訂價格</div><div class="amount">' + money(dai) + '</div><div class="sub">日幣 ¥' + jpy.toLocaleString('en-US') + '</div></div>' +
+          '<div><div class="tag">代訂價格</div><div class="amount">' + money(dai) + '</div><div class="sub">' + daiSub + '</div></div>' +
           '<button class="copy-btn" data-copy="代訂 ' + money(dai) + '">複製</button>' +
         '</div>' +
         '<div class="result-card lianxian">' +
@@ -313,6 +394,12 @@
 
   jpyInput.addEventListener('input', render);
   shoeToggle.addEventListener('change', render);
+  siteOpts.addEventListener('change', function () {
+    siteOpts.querySelectorAll('.site-opt').forEach(function (el) {
+      el.classList.toggle('selected', el.querySelector('input').checked);
+    });
+    render();
+  });
 
   var toastTimer = null;
   function showToast(text) {
