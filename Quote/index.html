@@ -2,6 +2,15 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
+  /* 2026-11-04 修正(闆娘原話:「你這個html給我不是這個介面啊」,截圖
+     顯示整個工具在深色底色下渲染)——這個檔案是要直接貼進花結官網 HTML
+     的獨立元件,不是透過 Claude 的 Artifact 平台顯示(平台才會有
+     data-theme 標記機制去分辨「使用者自己選深色」還是「系統預設跟著裝置」);
+     貼到官網之後,只要瀏覽的客人手機/電腦本身是深色模式,原本的
+     @media (prefers-color-scheme: dark) 就會讓這個小工具自己跳成深色,
+     跟官網其他部分(維持原本配色)完全對不起來、風格不一致。拿掉深色
+     模式這段,固定使用花結品牌的淺色配色,不管瀏覽者裝置是什麼模式都
+     長得一樣,跟官網其他地方的視覺一致。 */
   :root {
     --bg: #fff5f4;
     --card: #ffffff;
@@ -15,26 +24,6 @@
     --line: #f6d9d7;
     --morandi: #b5754b;
     --shadow: 0 18px 40px -22px rgba(165, 36, 61, 0.35);
-  }
-  :root[data-theme="dark"] {
-    --bg: #241114;
-    --card: #341a1f;
-    --peach-soft: #43232a;
-    --ink: #fbe6e6;
-    --muted: #c99aa0;
-    --line: #4a262c;
-    --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.6);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #241114;
-      --card: #341a1f;
-      --peach-soft: #43232a;
-      --ink: #fbe6e6;
-      --muted: #c99aa0;
-      --line: #4a262c;
-      --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.6);
-    }
   }
 
   * { box-sizing: border-box; }
