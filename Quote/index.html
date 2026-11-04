@@ -378,11 +378,15 @@
     var site = selectedSite();
     var dai = daidingPrice(jpy, false, site.fee);
     var lian = lianxianPrice(jpy, false);
-    var daiSub = '日幣 ¥' + jpy.toLocaleString('en-US') + (site.fee ? '　已加 ' + site.name + ' $' + site.fee : '');
+    // 2026-11-04 修正(闆娘原話:「不要藏在卡片裡面!!這件事是我們闆娘自己
+    // 知道就好了 但是那個報價小工具要讓客人選擇是否有這些網頁」)——
+    // 客人要能選網站(選了才會套用正確的代訂加價),但加價這件事本身、
+    // 加了多少錢,完全不給客人看到,連結果卡片這裡也不提一個字,只顯示
+    // 日幣原價,跟連線那張卡片的副標格式保持一致。
     resultsWrap.innerHTML =
       '<div class="results">' +
         '<div class="result-card daiding">' +
-          '<div><div class="tag">代訂價格</div><div class="amount">' + money(dai) + '</div><div class="sub">' + daiSub + '</div></div>' +
+          '<div><div class="tag">代訂價格</div><div class="amount">' + money(dai) + '</div><div class="sub">日幣 ¥' + jpy.toLocaleString('en-US') + '</div></div>' +
           '<button class="copy-btn" data-copy="代訂 ' + money(dai) + '">複製</button>' +
         '</div>' +
         '<div class="result-card lianxian">' +
