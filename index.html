@@ -351,6 +351,21 @@ function render(){
     grid.appendChild(card);
   });
 }
+function itemUrl(p){
+  const base = location.origin + location.pathname;
+  return p.code ? `${base}?item=${encodeURIComponent(p.code)}` : base;
+}
+function copyItemLink(idx){
+  const p = PRODUCTS[idx];
+  const url = itemUrl(p);
+  const btn = document.getElementById("copylinkbtn");
+  const done = ()=>{ if(btn){ const old=btn.textContent; btn.textContent="已複製連結 ✓"; setTimeout(()=>{btn.textContent=old;},1800); } };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=>prompt("複製這個連結:", url));
+  } else {
+    prompt("複製這個連結:", url);
+  }
+}
 let SELECTED_SIZE = "";
 function sizeOptions(p){
   return (p.size||"").split(/[,、\s]+/).map(s=>s.trim()).filter(Boolean);
@@ -399,7 +414,9 @@ function openDetail(idx){
         ? `<span class="buy disabled">已 售 完</span>`
         : `<div class="orderhint">🎀 <b>下單提醒:</b>送出表單為預訂,<b>完成匯款並經闆娘對帳確認後才算下單成功</b>。確認收款後才會替你安排賣貨便寄件唷。</div>
            <div id="orderbtns">${orderButtons(p)}</div>`}
+      ${p.code ? `<a class="buy line" id="copylinkbtn" href="#" onclick="copyItemLink(${idx});return false;">🔗 複製商品連結</a>` : ``}
     </div>`;
+  if(p.code) history.replaceState(null, "", itemUrl(p));
   modal.classList.add("open");
   document.body.style.overflow = "hidden";
   const sp = modal.querySelector(".sizepick");
@@ -430,6 +447,13 @@ function galleryNav(dir){
 function closeDetail(){
   document.getElementById("modal").classList.remove("open");
   document.body.style.overflow = "";
+  history.replaceState(null, "", location.pathname);
+}
+function openFromUrlIfMatched(){
+  const code = (new URLSearchParams(location.search).get("item")||"").trim();
+  if(!code) return;
+  const idx = PRODUCTS.findIndex(p=>p.code && p.code.toUpperCase()===code.toUpperCase());
+  if(idx>-1) openDetail(idx);
 }
 const FORM_ITEM_ENTRY = "entry.1407104401";
 function orderButtons(p){
@@ -527,7 +551,7 @@ function parseSheetCsv(text){
     price:col("台幣售價"), orig:col("日本原價"), size:col("尺寸標示"),
     len:col("衣長"), sleeve:col("袖長"), shoulder:col("肩寬"), chest:col("胸寬"),
     waist:col("腰圍"), hip:col("臀圍"),
-    photos:col("照片"), note:col("備註說明"),
+    photos:col("照片"), note:col("備註說明"), code:col("商品編號"),
   };
   const num = v => { const n=parseFloat((v||"").replace(/[^\d.]/g,""),10); return isNaN(n)?0:n; };
   const get = (cells,i) => i>=0 && i<cells.length ? cells[i].trim() : "";
@@ -542,6 +566,7 @@ function parseSheetCsv(text){
       photos:parsePhotos(get(c,ci.photos)),
       m:{衣長:get(c,ci.len),肩寬:get(c,ci.shoulder),胸寬:get(c,ci.chest),腰圍:get(c,ci.waist),臀圍:get(c,ci.hip),袖長:get(c,ci.sleeve)},
       note:get(c,ci.note),
+      code:get(c,ci.code),
     };
   }).filter(Boolean);
 }
@@ -555,7 +580,7 @@ function loadProducts(){
     .then(text=>{
       const items = parseSheetCsv(text);
       if(items.length){ PRODUCTS = items; }
-      renderFilters(); render();
+      renderFilters(); render(); openFromUrlIfMatched();
     })
     .catch(err=>{
       console.warn("讀試算表失敗,先顯示範例商品。", err);
